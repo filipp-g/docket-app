@@ -1,2 +1,2 @@
-# comp3004-android
+# docket-app
 COMP3004 Android Group Project
