@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "200843796540",
+    "firebase_url": "https://docker-27832.firebaseio.com",
+    "project_id": "docker-27832",
+    "storage_bucket": "docker-27832.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:200843796540:android:23e6ac8d3d6d074140e339",
+        "android_client_info": {
+          "package_name": "ca.carleton.comp3004f20.androidteamalpha.app"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "200843796540-hkbt09sp6kbolm2p9fgor5fs0850mcin.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "ca.carleton.comp3004f20.androidteamalpha.app",
+            "certificate_hash": "da49acb70f4ed5f37f5e7237a2efc9f0b3882a53"
+          }
+        },
+        {
+          "client_id": "200843796540-1mj1suo07k4ipabt5uvr652dntikhlda.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD330MPDtIWdEYHygranPWLDjTauKPdUjM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "200843796540-1mj1suo07k4ipabt5uvr652dntikhlda.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
