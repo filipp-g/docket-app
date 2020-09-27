@@ -54,7 +54,7 @@ public class MainActivity extends AppCompatActivity {
                 String email = emailId.getText().toString();
                 String password = passwordId.getText().toString();
 
-                sign_in(mAuth, "balcerzak.michael@gmail.com", "mX10baz3");
+                sign_in(mAuth, email, password);
             }
         });
 
