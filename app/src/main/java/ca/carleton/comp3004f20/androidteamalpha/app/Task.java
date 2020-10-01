@@ -40,4 +40,12 @@ public class Task {
 
         return task_To_Database;
     }
+
+    public long returnDueDate() {
+        return due_date.getTime();
+    }
+
+    public String returnName() {
+        return task_name;
+    }
 }
