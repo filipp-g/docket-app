@@ -20,24 +20,20 @@ public class CalenderEvent {
         end.set(year, month, day);
     }
 
-    public void getTask(Task task) {
+    public void setTask(Task task) {
         this.task = task;
     }
 
-    public long returnStartEvent() {
-        return start.getTimeInMillis();
+    public Task getTask() {
+        return task;
     }
 
-    public long returnEndEvent() {
-        return end.getTimeInMillis();
+    public Calendar returnStartEvent() {
+        return start;
     }
 
-    public Date returnStartEventDate() {
-        return start.getTime();
-    }
-
-    public Date returnEndEventDate() {
-        return end.getTime();
+    public Calendar returnEndEvent() {
+        return end;
     }
 
     public int returnColour() {
@@ -45,6 +41,6 @@ public class CalenderEvent {
     }
 
     public String returnName() {
-        return task.returnName();
+        return task.getName();
     }
 }

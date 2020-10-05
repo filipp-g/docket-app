@@ -51,7 +51,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <Button
-        android:id="@+id/button5"
+        android:id="@+id/chartButton"
         android:layout_width="95dp"
         android:layout_height="36dp"
         android:text="Chart"

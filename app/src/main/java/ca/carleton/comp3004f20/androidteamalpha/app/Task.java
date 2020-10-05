@@ -45,7 +45,7 @@ public class Task {
         return due_date.getTime();
     }
 
-    public String returnName() {
+    public String getName() {
         return task_name;
     }
 }
