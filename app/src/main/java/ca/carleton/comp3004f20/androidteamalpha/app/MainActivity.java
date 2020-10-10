@@ -3,6 +3,7 @@ package ca.carleton.comp3004f20.androidteamalpha.app;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -23,10 +24,14 @@ import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
 
+    private Button button;
+
     private FirebaseAuth mAuth;
     private DatabaseReference taskDatabase;
     private DatabaseReference projectDatabase;
     private FirebaseStorage storage = FirebaseStorage.getInstance();
+
+    CalenderActivity calenderActivity;
 
     private String user = "michael Balcerzak";
     private List<Task> listOfTasks;
@@ -36,20 +41,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Button signUp = (Button) findViewById(R.id.SignUp);
+        signUp.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openActivitySignUp();
+            }
+        });
+
         taskDatabase = FirebaseDatabase.getInstance().getReference().child(user).child("task");
         projectDatabase = FirebaseDatabase.getInstance().getReference().child(user).child("project");
         mAuth = FirebaseAuth.getInstance();
-        Map<String, Object> childUpdates = new HashMap<>();
-        childUpdates.put("task_id", 00000003);
-        childUpdates.put("task_name", "asdfasd retergsdgjhsdfg");
-        childUpdates.put("weight", 0.50);
-        childUpdates.put("time_required", 10);
 
         final EditText emailId = findViewById(R.id.editTextTextEmailAddress);
         final EditText passwordId = findViewById(R.id.editTextTextPassword);
-        Button btnSignIn = findViewById(R.id.button);
+        Button btnSignIn = findViewById(R.id.signIn);
         btnSignIn.setOnClickListener(new View.OnClickListener() {
-
             public void onClick(View v) {
                 String email = emailId.getText().toString();
                 String password = passwordId.getText().toString();
@@ -58,37 +66,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        taskDatabase.push().setValue(childUpdates);
+    }
+
+    public void openActivitySignUp() {
+        Intent intent = new Intent(this, ActivitySignUp.class);
+        startActivity(intent);
     }
 
     public void onStart() {
         super.onStart();
     }
 
-    public void sign_up(final FirebaseAuth mAuth, String email, String password) {
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            System.out.println("email and password is saved");
-                        } else {
-                            System.out.println("email and password is not saved");
-                        }
-                    }
-                });
-    }
     public void sign_in(final FirebaseAuth mAuth, String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            System.out.println("email and password is right");
+                            openMainMenu();
                         } else {
                             System.out.println("email and password is wrong");
                         }
                     }
                 });
+    }
+
+    public void openMainMenu() {
+        Intent intent = new Intent(this, MainMenu.class);
+        startActivity(intent);
     }
 }
