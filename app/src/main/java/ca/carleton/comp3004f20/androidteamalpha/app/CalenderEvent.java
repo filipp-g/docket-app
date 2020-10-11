@@ -45,6 +45,6 @@ public class CalenderEvent {
     }
 
     public String returnName() {
-        return task.returnName();
+        return task.getName();
     }
 }
