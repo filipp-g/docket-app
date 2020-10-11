@@ -1,0 +1,2 @@
+- Finish structure and basic logic for Task activity
+- Refactor Project to extend Task
