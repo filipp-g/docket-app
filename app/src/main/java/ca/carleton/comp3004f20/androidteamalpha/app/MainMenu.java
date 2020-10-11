@@ -21,10 +21,18 @@ public class MainMenu extends AppCompatActivity {
                 openCalenderActivity();
             }
         });
+
+        Button addTaskButton = findViewById(R.id.btnAddTask);
+        addTaskButton.setOnClickListener((x) -> addTask());
     }
 
     public void openCalenderActivity() {
         Intent intent = new Intent(this, CalenderActivity.class);
+        startActivity(intent);
+    }
+
+    private void addTask() {
+        Intent intent = new Intent(this, TaskActivity.class);
         startActivity(intent);
     }
 }

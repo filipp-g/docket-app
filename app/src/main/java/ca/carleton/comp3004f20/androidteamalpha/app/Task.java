@@ -16,7 +16,7 @@ public class Task {
     private boolean complete;
 
     public Task(long task_id, String task_name, Project task_project, Date due_date, float weight,
-         int time_required, int time_spent) {
+                int time_required, int time_spent) {
         this.task_id = task_id;
         this.task_name = task_name;
         this.task_project = task_project;
