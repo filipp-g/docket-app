@@ -1,2 +1,3 @@
 - Finish structure and basic logic for Task activity
 - Refactor Project to extend Task
+- Add and polish date + time pickers for Task Activity

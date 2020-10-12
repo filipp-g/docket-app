@@ -6,12 +6,12 @@
     android:layout_height="match_parent"
     tools:context=".TaskActivity">
 
-    <TextView
-        android:id="@+id/txtTaskName"
-        android:layout_width="148dp"
-        android:layout_height="37dp"
+    <EditText
+        android:id="@+id/editTextName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginTop="24dp"
-        android:text="Task Name"
+        android:hint="Task Name"
         android:textAlignment="center"
         android:textSize="24sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -90,12 +90,11 @@
 
     <Spinner
         android:id="@+id/spinnerProjects"
-        android:layout_width="100dp"
+        android:layout_width="150dp"
         android:layout_height="33dp"
         android:layout_marginTop="120dp"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/guideline3"
         app:layout_constraintTop_toTopOf="parent" />
 
     <EditText

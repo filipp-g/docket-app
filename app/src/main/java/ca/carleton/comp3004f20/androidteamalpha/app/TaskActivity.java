@@ -8,28 +8,34 @@ import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DateFormatSymbols;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Locale;
 
 public class TaskActivity extends AppCompatActivity {
 
-    private DatabaseReference mDatabase;
+    private final String USERNAME = "filipp";
 
-    private Spinner project;
-    private EditText dueDate, dueTime, weight, timeReq, timeSpent;
-    private SwitchMaterial complete;
+    private DatabaseReference taskDatabase;
+
+    private Spinner projectSpinner;
+    private EditText nameEdit, dueDateEdit, dueTimeEdit, weightEdit, timeReqEdit, timeSpentEdit;
+    private SwitchMaterial completeSwitch;
     private Button saveButton, deleteButton;
 
     @Override
@@ -37,22 +43,23 @@ public class TaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 
-        mDatabase = FirebaseDatabase.getInstance().getReference();
+        taskDatabase = FirebaseDatabase.getInstance().getReference().child(USERNAME).child("task");
         initElements();
     }
 
     private void initElements() {
-        project = findViewById(R.id.spinnerProjects);  //TODO populate with projects
+        nameEdit = findViewById(R.id.editTextName);
+        populateProjects();
 
-        dueDate = findViewById(R.id.editTextDate);
-        dueDate.setOnClickListener(f -> showDatePickerDialog());
-        dueTime = findViewById(R.id.editTextTime);
-        dueTime.setOnClickListener(f -> showTimePickerDialog());
+        dueDateEdit = findViewById(R.id.editTextDate);
+        dueDateEdit.setOnClickListener(f -> showDatePickerDialog());
+        dueTimeEdit = findViewById(R.id.editTextTime);
+        dueTimeEdit.setOnClickListener(f -> showTimePickerDialog());
 
-        weight = findViewById(R.id.editTextWeight);
-        timeReq = findViewById(R.id.editTextTimeReq);
-        timeSpent = findViewById(R.id.editTextTimeSpent);
-        complete = findViewById(R.id.switchComplete);
+        weightEdit = findViewById(R.id.editTextWeight);
+        timeReqEdit = findViewById(R.id.editTextTimeReq);
+        timeSpentEdit = findViewById(R.id.editTextTimeSpent);
+        completeSwitch = findViewById(R.id.switchComplete);
 
         saveButton = findViewById(R.id.btnSave);
         saveButton.setOnClickListener(f -> saveTask());
@@ -60,9 +67,54 @@ public class TaskActivity extends AppCompatActivity {
         deleteButton.setOnClickListener(f -> deleteTask());
     }
 
+    private void populateProjects() {
+        List<String> projectList = new ArrayList<>();
+        projectList.add("long name project");
+        projectList.add("comp3203");
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                this, android.R.layout.simple_spinner_item, projectList);
+
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        projectSpinner = findViewById(R.id.spinnerProjects);
+        projectSpinner.setAdapter(adapter);
+    }
+
     private void saveTask() {
-        //TODO figure out how to store project
-//        Date date = dueDate
+        String name = nameEdit.getText().toString();
+        if (name.isEmpty()) {
+            nameEdit.setError("Name is required");
+            return;
+        }
+        String project = projectSpinner.getSelectedItem().toString();
+        String dueDate = dueDateEdit.getText().toString();
+        String dueTime = dueTimeEdit.getText().toString();
+
+        int weight = 0, timeReq = 0, timeSpent = 0;
+        if (!weightEdit.getText().toString().isEmpty()) {
+            weight = Integer.parseInt(weightEdit.getText().toString());
+        }
+        if (!timeReqEdit.getText().toString().isEmpty()) {
+            timeReq = Integer.parseInt(timeReqEdit.getText().toString());
+        }
+        if (!timeSpentEdit.getText().toString().isEmpty()) {
+            timeSpent = Integer.parseInt(timeSpentEdit.getText().toString());
+        }
+        boolean complete = completeSwitch.isChecked();
+
+        DatabaseReference pushRef = taskDatabase.push();
+        pushRef.setValue(
+                new Task(pushRef.getKey(), name, project, dueDate, dueTime, weight,
+                timeReq, timeSpent, complete),
+                (error, ref) -> {
+                    if (error == null) {
+                        Toast.makeText(getApplicationContext(), "Task saved", Toast.LENGTH_SHORT).show();
+                        finish();
+                    } else {
+                        Toast.makeText(getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                }
+        );
     }
 
     private void deleteTask() {
@@ -70,15 +122,14 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void showDatePickerDialog() {
-        DialogFragment newFragment = new DatePickerFragment(dueDate);
+        DialogFragment newFragment = new DatePickerFragment(dueDateEdit);
         newFragment.show(getSupportFragmentManager(), "datePicker");
     }
 
     private void showTimePickerDialog() {
-        DialogFragment newFragment = new TimePickerFragment(dueTime);
+        DialogFragment newFragment = new TimePickerFragment(dueTimeEdit);
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
-
 
     public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
         private EditText mEditText;

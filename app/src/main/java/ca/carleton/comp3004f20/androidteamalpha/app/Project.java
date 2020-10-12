@@ -1,7 +1,6 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class Project extends Task {
@@ -12,9 +11,9 @@ public class Project extends Task {
         this.projectTasks = new ArrayList<>();
     }
 
-    public Project(long id, String name, Project project, Date dueDate, float weight,
-                   int timeRequired, int timeSpent, List<Task> projectTasks) {
-        super(id, name, project, dueDate, weight, timeRequired, timeSpent);
+    public Project(String id, String name, String projectId, String dueDate, String dueTime,
+                   int weight, int timeRequired, int timeSpent, boolean complete, List<Task> projectTasks) {
+        super(id, name, projectId, dueDate, dueTime, weight, timeRequired, timeSpent, complete);
         this.projectTasks = projectTasks;
     }
 

@@ -4,43 +4,46 @@ import java.util.Date;
 
 public class Task {
 
-    private long id;
+    private String id;
     private String name;
-    private Project project;
-    private Date dueDate;
-    private float weight;
+    private String projectId;
+    private String dueDate;
+    private String dueTime;
+    private int weight;
     private int timeRequired;
     private int timeSpent;
     private boolean complete;
 
     public Task() {
-        this.id = 0;
+        this.id = "";
         this.name = "";
-        this.project = null;
-        this.dueDate = new Date();
+        this.projectId = "";
+        this.dueDate = "";
+        this.dueTime = "";
         this.weight = 0;
         this.timeRequired = 0;
         this.timeSpent = 0;
         this.complete = false;
     }
 
-    public Task(long id, String name, Project project, Date dueDate, float weight,
-                int timeRequired, int timeSpent) {
+    public Task(String id, String name, String projectId, String dueDate, String dueTime,
+                int weight, int timeRequired, int timeSpent, boolean complete) {
         this.id = id;
         this.name = name;
-        this.project = project;
+        this.projectId = projectId;
         this.dueDate = dueDate;
+        this.dueTime = dueTime;
         this.weight = weight;
         this.timeRequired = timeRequired;
         this.timeSpent = timeSpent;
-        this.complete = false;
+        this.complete = complete;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -52,27 +55,35 @@ public class Task {
         this.name = name;
     }
 
-    public Project getProject() {
-        return project;
+    public String getProjectId() {
+        return projectId;
     }
 
-    public void setProject(Project project) {
-        this.project = project;
+    public void setProjectId(String projectId) {
+        this.projectId = projectId;
     }
 
-    public Date getDueDate() {
+    public String getDueDate() {
         return dueDate;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
 
-    public float getWeight() {
+    public String getDueTime() {
+        return dueTime;
+    }
+
+    public void setDueTime(String dueTime) {
+        this.dueTime = dueTime;
+    }
+
+    public int getWeight() {
         return weight;
     }
 
-    public void setWeight(float weight) {
+    public void setWeight(int weight) {
         this.weight = weight;
     }
 
