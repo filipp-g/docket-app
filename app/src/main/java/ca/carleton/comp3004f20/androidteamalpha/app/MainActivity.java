@@ -43,12 +43,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         Button signUp = (Button) findViewById(R.id.SignUp);
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openActivitySignUp();
-            }
-        });
+        signUp.setOnClickListener(v -> openActivitySignUp());
 
         taskDatabase = FirebaseDatabase.getInstance().getReference().child(user).child("task");
         projectDatabase = FirebaseDatabase.getInstance().getReference().child(user).child("project");
@@ -57,13 +52,11 @@ public class MainActivity extends AppCompatActivity {
         final EditText emailId = findViewById(R.id.editTextTextEmailAddress);
         final EditText passwordId = findViewById(R.id.editTextTextPassword);
         Button btnSignIn = findViewById(R.id.signIn);
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                String email = emailId.getText().toString();
-                String password = passwordId.getText().toString();
+        btnSignIn.setOnClickListener(v -> {
+            String email = emailId.getText().toString();
+            String password = passwordId.getText().toString();
 
-                sign_in(mAuth, email, password);
-            }
+            sign_in(mAuth, email, password);
         });
 
     }
@@ -79,14 +72,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void sign_in(final FirebaseAuth mAuth, String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            openMainMenu();
-                        } else {
-                            System.out.println("email and password is wrong");
-                        }
+                .addOnCompleteListener(this, task -> {
+                    if (task.isSuccessful()) {
+                        openMainMenu();
+                    } else {
+                        System.out.println("email and password is wrong");
                     }
                 });
     }
