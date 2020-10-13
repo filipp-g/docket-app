@@ -6,7 +6,11 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 public class MainMenu extends AppCompatActivity {
 
@@ -29,6 +33,40 @@ public class MainMenu extends AppCompatActivity {
                 openMainActivity();
             }
         });
+
+        Button newButton;
+
+        HorizontalScrollView scrollView = (HorizontalScrollView) findViewById(R.id.scrollable);
+
+        LinearLayout mainLayout = new LinearLayout(this);
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+        LinearLayout topLayout = new LinearLayout(this);
+        topLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout bottomLayout = new LinearLayout(this);
+        bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        for (int counter = 0; counter < 20; counter++) {
+            newButton = new Button(this);
+            newButton.setId(counter);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(370,370);
+            params.leftMargin = 40;
+            params.topMargin = 40;
+
+            newButton.setLayoutParams(params);
+            newButton.setText(String.valueOf(counter));
+
+            if (counter % 2 == 0) {
+                topLayout.addView(newButton);
+            } else {
+                bottomLayout.addView(newButton);
+            }
+        }
+
+        mainLayout.addView(topLayout );
+        mainLayout.addView(bottomLayout);
+
+        scrollView.addView(mainLayout);
+
     }
 
     public void openCalenderActivity() {
