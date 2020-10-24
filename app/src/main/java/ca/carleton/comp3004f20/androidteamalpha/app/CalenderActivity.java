@@ -1,5 +1,7 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
@@ -9,8 +11,13 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.nfc.Tag;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.CalendarContract;
+import android.provider.DocumentsContract;
 import android.util.EventLog;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -18,66 +25,78 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import ca.carleton.comp3004f20.androidteamalpha.app.Notification.*;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
 public class CalenderActivity extends AppCompatActivity {
+    private static final String TAG = "ViewDatabase";
 
-    CompactCalendarView compactCalendar;
+    private CompactCalendarView compactCalendar;
     private NotificationManagerCompat notificationManager;
     private SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MMMM- yyyy", Locale.getDefault());
-    private int numberOfdaysBeforeReminder = 3;
+    private String userName = "filipp";
 
-    public List<CalenderEvent> calenderListOfEvents;
+    public List<CalenderEvent> calenderListOfEvents = new ArrayList<>();
 
+    private FirebaseAuth mAuth;
+    private FirebaseAuth.AuthStateListener mAuthListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_calender);
 
+        Intent intent = getIntent();
+        userName = intent.getStringExtra("NAME");
+        System.out.println(userName);
+
         final ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(false);
         actionBar.setTitle(null);
 
-        compactCalendar = (CompactCalendarView) findViewById(R.id.compactcalendar_view);
+        compactCalendar = findViewById(R.id.compactcalendar_view);
         compactCalendar.setUseThreeLetterAbbreviation(true);
 
-        calenderListOfEvents = new ArrayList<>();
+        mAuth = FirebaseAuth.getInstance();
 
-        for (int counter = 0; counter < calenderListOfEvents.size(); counter++) {
-            CalenderEvent calenderEventCounter = calenderListOfEvents.get(counter);
-            Event startEvent = new Event(calenderEventCounter.returnColour(),
-                    calenderEventCounter.returnStartEvent().getTimeInMillis(),
-                    calenderEventCounter.returnName() + " start date");
-            Event endEvent = new Event(calenderEventCounter.returnColour(),
-                    calenderEventCounter.returnEndEvent().getTimeInMillis(),
-                    calenderEventCounter.returnName() + " end date");
-            compactCalendar.addEvent(startEvent);
-            compactCalendar.addEvent(endEvent);
+        FirebaseDatabase.getInstance().getReference().child(userName).child("tasks")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        getEvents(dataSnapshot);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
 
-            if (calenderEventCounter.returnEndEvent().getTime().getDay() - calenderEventCounter.returnStartEvent().getTime().getDay() == numberOfdaysBeforeReminder) {
-                if (calenderEventCounter.getTask().getName().toUpperCase().contains("test")) {
-                    sendNotification(calenderEventCounter.getTask().getName(), "Test is coming on " + numberOfdaysBeforeReminder, 1, ca.carleton.comp3004f20.androidteamalpha.app.Notification.TEST_CHANNEL, Color.RED);
-                }
-
-                if (calenderEventCounter.getTask().getName().toUpperCase().contains("assignment")) {
-                    sendNotification(calenderEventCounter.getTask().getName(), "Assignment is coming on " + numberOfdaysBeforeReminder, 1, ca.carleton.comp3004f20.androidteamalpha.app.Notification.ASSIGNMENT_CHANNEL, Color.GREEN);
-                }
-
-                if (calenderEventCounter.getTask().getName().toUpperCase().contains("exam")) {
-                    sendNotification(calenderEventCounter.getTask().getName(), "Ecture is coming on " + numberOfdaysBeforeReminder, 1, ca.carleton.comp3004f20.androidteamalpha.app.Notification.TEST_CHANNEL, Color.CYAN);
+        mAuthListener = new FirebaseAuth.AuthStateListener() {
+            @Override
+            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    Log.d(TAG, "log in: " + user.getEmail());
+                } else {
+                    Log.d(TAG, "log out: " + user.getEmail());
                 }
             }
-        }
-
+        };
 
         compactCalendar.setListener(new CompactCalendarView.CompactCalendarViewListener() {
             @Override
@@ -119,16 +138,59 @@ public class CalenderActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void addEvent(int startYear, int startMonth, int startDay,
-                    int endYear, int endMonth, int endDay) {
-        CalenderEvent calenderEvent = new CalenderEvent();
-        calenderEvent.setStartEvent(startYear, startMonth, startDay);
-        calenderEvent.setEndEvent(endYear, endMonth, endDay);
+    @RequiresApi(api = Build.VERSION_CODES.O)
+    private void getEvents(DataSnapshot snapshot) {
 
-        calenderListOfEvents.add(calenderEvent);
+        calenderListOfEvents.clear();
+        for (DataSnapshot task : snapshot.getChildren()) {
+            String completeString = task.child("complete").getValue().toString();
+            boolean complete = Boolean.parseBoolean(completeString);
+            String due_time  = task.child("due_Time").getValue().toString();
+            String due_date = task.child("due_date").getValue().toString();
+            String task_id = task.child("task_id").getValue().toString();
+            String task_name  = task.child("task_name").getValue().toString();
+            int time_required  = Integer.parseInt(task.child("time_required").getValue().toString());
+            int time_spent = Integer.parseInt(task.child("time_spent").getValue().toString());
+            float weight  = Integer.parseInt(task.child("weight").getValue().toString());
+            try {
+                Task taskObject = new Task(complete, due_date, due_time, task_id, task_name, time_required, time_spent, weight);
+                CalenderEvent calenderEvent = new CalenderEvent();
+                calenderEvent.setTask(taskObject);
+                calenderEvent.setEndEvent(taskObject.getDue_Date());
+                calenderListOfEvents.add(calenderEvent);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+        for (int counter = 0; counter < calenderListOfEvents.size(); counter++) {
+            CalenderEvent calenderEventCounter = calenderListOfEvents.get(counter);
+            Event endEvent = new Event(Color.GREEN,
+                    calenderEventCounter.getEndEvent(),
+                    calenderEventCounter.returnName() + " end date");
+            compactCalendar.addEvent(endEvent);
+
+            /*if (calenderEventCounter.getEndEvent().getTime() - calenderEventCounter.
+                    getStartEvent().getTime().getDay() == numberOfDaysBeforeReminder) {
+                if (calenderEventCounter.getTask().getName().toUpperCase().contains("test")) {
+                    sendNotification(calenderEventCounter.getTask().getName(), "Test is coming on " + numberOfDaysBeforeReminder, 1, ca.carleton.comp3004f20.androidteamalpha.app.Notification.TEST_CHANNEL, Color.RED);
+                }
+
+                if (calenderEventCounter.getTask().getName().toUpperCase().contains("assignment")) {
+                    sendNotification(calenderEventCounter.getTask().getName(), "Assignment is coming on " + numberOfDaysBeforeReminder, 1, ca.carleton.comp3004f20.androidteamalpha.app.Notification.ASSIGNMENT_CHANNEL, Color.GREEN);
+                }
+
+                if (calenderEventCounter.getTask().getName().toUpperCase().contains("exam")) {
+                    sendNotification(calenderEventCounter.getTask().getName(), "Ecture is coming on " + numberOfDaysBeforeReminder, 1, ca.carleton.comp3004f20.androidteamalpha.app.Notification.TEST_CHANNEL, Color.CYAN);
+                }
+            }*/
+        }
     }
 
-    public CalenderEvent getEvent() {
+
+
+
+    public CalenderEvent getFirstEvent() {
         return calenderListOfEvents.get(0);
     }
 
