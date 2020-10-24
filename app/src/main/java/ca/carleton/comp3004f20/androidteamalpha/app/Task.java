@@ -1,5 +1,13 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
+
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
 import java.util.Date;
 
 public class Task {
@@ -63,16 +71,16 @@ public class Task {
         this.projectId = projectId;
     }
 
-    public String getDueDate() {
-        return dueDate;
+    public Date getDueDate() throws ParseException {
+        return new SimpleDateFormat("MMM dd yyyy").parse(dueDate);
     }
 
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
 
-    public String getDueTime() {
-        return dueTime;
+    public Date getDueTime() throws ParseException {
+        return new SimpleDateFormat("hh:mm aa").parse(dueTime);
     }
 
     public void setDueTime(String dueTime) {

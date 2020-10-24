@@ -8,40 +8,40 @@ import java.util.Date;
 public class CalenderEvent {
 
     private int color;
-    private Calendar start = Calendar.getInstance();
-    private Calendar end = Calendar.getInstance();
+    private Date start;
+    private Date end;
     private Task task;
 
-    public void setStartEvent(int year, int month, int day) {
-        start.set(year, month, day);
+
+    public void setColor(int color) {
+        this.color = color;
+    }
+    public void setStartEvent(Date date) {
+        start = date;
     }
 
-    public void setEndEvent(int year, int month, int day) {
-        end.set(year, month, day);
+    public void setEndEvent(Date date) {
+        end = date;
     }
 
-    public void getTask(Task task) {
+    public void setTask(Task task) {
         this.task = task;
     }
 
-    public long returnStartEvent() {
-        return start.getTimeInMillis();
+    public int getColour() {
+        return color;
     }
 
-    public long returnEndEvent() {
-        return end.getTimeInMillis();
-    }
-
-    public Date returnStartEventDate() {
+    public long getStartEvent() {
         return start.getTime();
     }
 
-    public Date returnEndEventDate() {
+    public long getEndEvent() {
         return end.getTime();
     }
 
-    public int returnColour() {
-        return color;
+    public Task getTask() {
+        return task;
     }
 
     public String returnName() {
