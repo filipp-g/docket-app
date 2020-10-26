@@ -31,6 +31,7 @@ import java.util.Objects;
 public class MainMenu extends AppCompatActivity {
     private static final String TAG = "ViewDatabase";
     int counter = 0;
+    int numOfTasks = 0;
 
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private FirebaseDatabase mFirebaseDatabase;
@@ -88,7 +89,10 @@ public class MainMenu extends AppCompatActivity {
         LinearLayout bottomLayout = new LinearLayout(this);
         bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
 
-        for (counter = 0; counter < 20; counter++) {
+        mAuth = FirebaseAuth.getInstance();
+        mFirebaseDatabase = FirebaseDatabase.getInstance();
+
+        for (counter = 0; counter < numOfTasks; counter++) {
             Button newButton = new Button(this);
             newButton.setId(counter);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(370,370);
@@ -105,8 +109,6 @@ public class MainMenu extends AppCompatActivity {
             }
         }
 
-        mAuth = FirebaseAuth.getInstance();
-        mFirebaseDatabase = FirebaseDatabase.getInstance();
         FirebaseUser user = mAuth.getCurrentUser();
 
         mAuthListener = new FirebaseAuth.AuthStateListener() {
@@ -138,6 +140,12 @@ public class MainMenu extends AppCompatActivity {
                 name = user.child("name").getValue().toString();
             }
         }
+
+        //numOfTasks =
+    }
+
+    private void getNum(DataSnapshot dataSnapshot) {
+        numOfTasks = (int) dataSnapshot.getChildrenCount();
     }
 
     public void openCalenderActivity() {
@@ -153,6 +161,7 @@ public class MainMenu extends AppCompatActivity {
 
     private void addTask() {
         Intent intent = new Intent(this, TaskActivity.class);
+        intent.putExtra("NAME", name);
         startActivity(intent);
     }
 }

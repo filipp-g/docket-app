@@ -7,6 +7,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -29,7 +30,7 @@ import java.util.Locale;
 
 public class TaskActivity extends AppCompatActivity {
 
-    private final String USERNAME = "filipp";
+    private String USERNAME;
 
     private DatabaseReference taskDatabase;
 
@@ -43,7 +44,10 @@ public class TaskActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task);
 
-        taskDatabase = FirebaseDatabase.getInstance().getReference().child(USERNAME).child("task");
+        Intent intent = getIntent();
+        USERNAME = intent.getStringExtra("NAME");
+
+        taskDatabase = FirebaseDatabase.getInstance().getReference().child(USERNAME).child("tasks");
         initElements();
     }
 
