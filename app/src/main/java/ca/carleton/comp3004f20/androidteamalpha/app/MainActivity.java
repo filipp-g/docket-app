@@ -30,17 +30,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        FirebaseDatabase.getInstance().getReference().child("users")
-                .addListenerForSingleValueEvent(new ValueEventListener() {
-                    @RequiresApi(api = Build.VERSION_CODES.O)
-                    @Override
-                    public void onDataChange(DataSnapshot dataSnapshot) {
-                        getName(dataSnapshot);
-                    }
-                    @Override
-                    public void onCancelled(DatabaseError databaseError) {
-                    }
-                });
+        initialize();
 
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
@@ -74,6 +64,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView.OnNavigationItemSelectedListener bottomNavMethod = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            initialize();
+
             Fragment fragment = null;
 
             switch (item.getItemId()) {
@@ -111,6 +103,23 @@ public class MainActivity extends AppCompatActivity {
             if (emailFromDatabase.equals(email)) {
                 userName = user.child("name").getValue().toString();
             }
+        }
+    }
+
+    private void initialize() {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseDatabase.getInstance().getReference().child("users")
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            getName(dataSnapshot);
+                        }
+
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
         }
     }
 }
