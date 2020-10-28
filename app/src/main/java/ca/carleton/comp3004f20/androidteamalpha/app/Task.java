@@ -71,7 +71,11 @@ public class Task {
         this.projectId = projectId;
     }
 
-    public Date getDueDate() throws ParseException {
+    public String getDueDate() throws ParseException {
+        return dueDate;
+    }
+
+    public Date getDueDateAsSimpleDate() throws ParseException {
         return new SimpleDateFormat("MMM dd yyyy").parse(dueDate);
     }
 
@@ -79,7 +83,11 @@ public class Task {
         this.dueDate = dueDate;
     }
 
-    public Date getDueTime() throws ParseException {
+    public String getDueTime() throws ParseException {
+        return dueTime;
+    }
+
+    public Date getDueTimeAsSimpleDate() throws ParseException {
         return new SimpleDateFormat("hh:mm aa").parse(dueTime);
     }
 
