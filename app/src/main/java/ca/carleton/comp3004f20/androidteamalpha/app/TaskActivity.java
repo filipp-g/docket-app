@@ -106,9 +106,11 @@ public class TaskActivity extends AppCompatActivity {
         }
         boolean complete = completeSwitch.isChecked();
 
+        String normalDueDate = dueDate;
+
         DatabaseReference pushRef = taskDatabase.push();
         pushRef.setValue(
-                new Task(pushRef.getKey(), name, project, dueDate, dueTime, weight,
+                new Task(pushRef.getKey(), name, project, "Nov 25 2020", dueTime, weight,
                 timeReq, timeSpent, complete),
                 (error, ref) -> {
                     if (error == null) {

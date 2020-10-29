@@ -61,7 +61,6 @@ public class ActivitySignUp extends AppCompatActivity {
                             childUpdates.put("name", name);
 
                             DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
-                            mDatabase.push().setValue(name);
                             mDatabase.child("users").push().updateChildren(childUpdates);
 
                             System.out.println("email and password is saved");

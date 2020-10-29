@@ -4,6 +4,8 @@ import android.os.Build;
 
 import androidx.annotation.RequiresApi;
 
+import com.google.firebase.database.DataSnapshot;
+
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -71,7 +73,11 @@ public class Task {
         this.projectId = projectId;
     }
 
-    public Date getDueDate() throws ParseException {
+    public String getDueDate() throws ParseException {
+        return dueDate;
+    }
+
+    public Date getDueDateAsDateFormat() throws ParseException {
         return new SimpleDateFormat("MMM dd yyyy").parse(dueDate);
     }
 
@@ -79,7 +85,11 @@ public class Task {
         this.dueDate = dueDate;
     }
 
-    public Date getDueTime() throws ParseException {
+    public String getDueTime() throws ParseException {
+        return dueTime;
+    }
+
+    public Date getDueTimeAsDateFormat() throws ParseException {
         return new SimpleDateFormat("hh:mm aa").parse(dueTime);
     }
 
