@@ -1,37 +1,30 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.RequiresApi;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.firebase.ui.database.FirebaseRecyclerOptions;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.database.Query;
 
 public class ProjectsFragment extends Fragment {
-    private static final String TAG = "ViewDatabase";
     private static final String EMAIL = "email";
-    private static final String USER= "user";
+    private static final String USER = "user";
 
-    int counter = 0;
-    int numOfTasks = 0;
+    private DatabaseReference taskDatabase;
+    private TaskRecViewAdapter adapter;
+    private RecyclerView projectsRecView;
 
-    private FirebaseDatabase mFirebaseDatabase;
-    private FirebaseAuth mAuth;
-    private FirebaseAuth.AuthStateListener mAuthListener;
     private String user;
     private String email;
 
@@ -49,18 +42,15 @@ public class ProjectsFragment extends Fragment {
     }
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
-
-    @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_projects, container, false);
 
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
+            getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, new SignInFragment())
+                    .commit();
             Toast.makeText(getActivity(), "Please sign in...", Toast.LENGTH_SHORT).show();
         } else {
             if (getArguments() != null) {
@@ -68,18 +58,30 @@ public class ProjectsFragment extends Fragment {
                 user = getArguments().getString(USER);
             }
 
-            Button signUp = (Button) view.findViewById(R.id.btnAddTask);
-            signUp.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, TaskFragment.newInstance(email, user)).commit();
-                }
-            });
+            taskDatabase = FirebaseDatabase.getInstance().getReference().child(user);
+            Query query = taskDatabase.child("tasks");
+
+            FirebaseRecyclerOptions<Task> options = new FirebaseRecyclerOptions.Builder<Task>()
+                    .setQuery(query, Task.class)
+                    .setLifecycleOwner(this)
+                    .build();
+
+            adapter = new TaskRecViewAdapter(options);
+
+            projectsRecView = view.findViewById(R.id.projectsRecView);
+            projectsRecView.setAdapter(adapter);
+            projectsRecView.setLayoutManager(new LinearLayoutManager(getContext()));
+
+            Button addTask = (Button) view.findViewById(R.id.btnAddTask);
+            addTask.setOnClickListener(v ->
+                    getActivity()
+                            .getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container, TaskFragment.newInstance(email, user))
+                            .commit()
+            );
         }
         return view;
     }
 
-    private void getNum(DataSnapshot dataSnapshot) {
-        numOfTasks = (int) dataSnapshot.getChildrenCount();
-    }
 }

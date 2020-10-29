@@ -65,7 +65,7 @@ public class Task {
         this.projectId = projectId;
     }
 
-    public String getDueDate() throws ParseException {
+    public String getDueDate() {
         return dueDate;
     }
 
@@ -77,7 +77,7 @@ public class Task {
         this.dueDate = dueDate;
     }
 
-    public String getDueTime() throws ParseException {
+    public String getDueTime() {
         return dueTime;
     }
 

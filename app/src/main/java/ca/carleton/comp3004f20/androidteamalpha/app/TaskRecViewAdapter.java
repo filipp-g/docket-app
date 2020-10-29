@@ -12,10 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 
-import java.util.ArrayList;
-
 public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecViewAdapter.ViewHolder> {
-    private ArrayList<Task> tasks = new ArrayList<>();
 
     public TaskRecViewAdapter(@NonNull FirebaseRecyclerOptions<Task> options) {
         super(options);
@@ -32,18 +29,8 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
     protected void onBindViewHolder(@NonNull ViewHolder viewHolder, int i, @NonNull Task task) {
         viewHolder.taskComplete.setChecked(task.isComplete());
         viewHolder.txtTaskName.setText(task.getName());
-        viewHolder.txtDueDate.setText(task.getDueDateString());
-        viewHolder.txtTimeLeft.setText(task.getTimeSpent());     //TODO do actual calculation
-    }
-
-    @Override
-    public int getItemCount() {
-        return tasks.size();
-    }
-
-    public void setTasks(ArrayList<Task> tasks) {
-        this.tasks = tasks;
-        notifyDataSetChanged();
+        viewHolder.txtDueDate.setText(task.getDueDate());
+//        viewHolder.txtTimeLeft.setText(task.getTimeSpent());     //TODO for some reason this throws exception
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {
