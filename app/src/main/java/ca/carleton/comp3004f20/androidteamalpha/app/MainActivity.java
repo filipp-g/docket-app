@@ -3,48 +3,26 @@ package ca.carleton.comp3004f20.androidteamalpha.app;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
 
-import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.EditText;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.firebase.auth.AuthResult;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.google.firebase.storage.FirebaseStorage;
-
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class MainActivity extends AppCompatActivity {
-    public static final String EXTRA_TEXT = "ca.carleton.comp3004f20.androidteamalpha.app.EXTRA_TEXT";
-    String name;
-
-    private Button button;
-
-    private FirebaseAuth mAuth;
-
-    CalenderActivity calenderActivity;
-
-    private String user = "michael Balcerzak";
-    private List<Task> listOfTasks;
-    private List<Project> listOfProject;
+    private BottomNavigationView bottomNavigationView;
+    private String userName;
+    private String email;
 
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
@@ -52,57 +30,96 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Button signUp = (Button) findViewById(R.id.SignUp);
-        signUp.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openActivitySignUp();
+        initialize();
+
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
+        bottomNavigationView.setSelectedItemId(R.id.nav_profile);
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, getProfileFragment()).commit();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflator = getMenuInflater();
+        inflator.inflate(R.menu.top_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_signout:
+                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                    FirebaseAuth.getInstance().signOut();
+                }
+                getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
+                Toast.makeText(this, "Signing Out", Toast.LENGTH_SHORT).show();
+                return true;
+
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener bottomNavMethod = new BottomNavigationView.OnNavigationItemSelectedListener() {
+        @Override
+        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+            initialize();
+
+            Fragment fragment = null;
+
+            switch (item.getItemId()) {
+                case R.id.nav_projects:
+                    fragment = ProjectsFragment.newInstance(email, userName);
+                    break;
+                case R.id.nav_overview:
+                    fragment = CalendarFragment.newInstance(email, userName);
+                    break;
+                case R.id.nav_timer:
+                    fragment = TimerFragment.newInstance(email, userName);
+                    break;
+                default:
+                    fragment = getProfileFragment();
+                    break;
             }
-        });
 
-        DatabaseReference mDatabase = FirebaseDatabase.getInstance().getReference();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+            return true;
+        }
+    };
 
-        mAuth = FirebaseAuth.getInstance();
+    private Fragment getProfileFragment() {
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            return SignInFragment.newInstance(email, userName);
+        }
+        return ProfileFragment.newInstance(email, userName);
+    }
 
-        final EditText emailId = findViewById(R.id.editTextTextEmailAddress);
-        final EditText passwordId = findViewById(R.id.editTextTextPassword);
-        Button btnSignIn = findViewById(R.id.signIn);
-        btnSignIn.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                String email = emailId.getText().toString();
-                String password = passwordId.getText().toString();
+    private void getName(DataSnapshot dataSnapshot) {
+        email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
 
-                sign_in(mAuth, email, password);
+        for (DataSnapshot user : dataSnapshot.getChildren()) {
+            String emailFromDatabase = user.child("email").getValue().toString();
+            if (emailFromDatabase.equals(email)) {
+                userName = user.child("name").getValue().toString();
             }
-        });
+        }
     }
 
-    public void openActivitySignUp() {
-        Intent intent = new Intent(this, ActivitySignUp.class);
-        startActivity(intent);
-    }
-
-    public void onStart() {
-        super.onStart();
-    }
-
-    public void sign_in(final FirebaseAuth mAuth, final String email, String password) {
-        mAuth.signInWithEmailAndPassword(email, password)
-                .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
-                    @Override
-                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
-                        if (task.isSuccessful()) {
-                            openMainMenu(email);
-                        } else {
-                            System.out.println("email and password is wrong");
+    private void initialize() {
+        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+            FirebaseDatabase.getInstance().getReference().child("users")
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @RequiresApi(api = Build.VERSION_CODES.O)
+                        @Override
+                        public void onDataChange(DataSnapshot dataSnapshot) {
+                            getName(dataSnapshot);
                         }
-                    }
-                });
-    }
 
-    public void openMainMenu(final String email) {
-        Intent intent = new Intent(this, MainMenu.class);
-        intent.putExtra("EMAIL", email);
-        startActivity(intent);
+                        @Override
+                        public void onCancelled(DatabaseError databaseError) {
+                        }
+                    });
+        }
     }
 }

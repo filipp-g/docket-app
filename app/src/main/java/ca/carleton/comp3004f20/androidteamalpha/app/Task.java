@@ -89,7 +89,7 @@ public class Task {
         return dueTime;
     }
 
-    public Date getDueTimeAsDateFormat() throws ParseException {
+    public Date getDueTimeAsSimpleDate() throws ParseException {
         return new SimpleDateFormat("hh:mm aa").parse(dueTime);
     }
 
