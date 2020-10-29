@@ -146,7 +146,7 @@ public class CalenderActivity extends AppCompatActivity {
                         weight, time_required, time_spent, complete);
                 CalenderEvent calenderEvent = new CalenderEvent();
                 calenderEvent.setTask(taskObject);
-                calenderEvent.setEndEvent(taskObject.getDueDate());
+                calenderEvent.setEndEvent(taskObject.getDueDateAsSimpleDate());
                 calenderListOfEvents.add(calenderEvent);
             } catch (ParseException e) {
                 e.printStackTrace();

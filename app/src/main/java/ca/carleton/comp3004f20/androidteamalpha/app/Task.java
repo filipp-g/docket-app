@@ -3,7 +3,6 @@ package ca.carleton.comp3004f20.androidteamalpha.app;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.Locale;
 
 public class Task {
 
@@ -66,16 +65,24 @@ public class Task {
         this.projectId = projectId;
     }
 
-    public Date getDueDate() throws ParseException {
-        return new SimpleDateFormat("MMM dd yyyy", Locale.CANADA).parse(dueDate);
+    public String getDueDate() throws ParseException {
+        return dueDate;
+    }
+
+    public Date getDueDateAsSimpleDate() throws ParseException {
+        return new SimpleDateFormat("MMM dd yyyy").parse(dueDate);
     }
 
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
 
-    public Date getDueTime() throws ParseException {
-        return new SimpleDateFormat("hh:mm aa", Locale.CANADA).parse(dueTime);
+    public String getDueTime() throws ParseException {
+        return dueTime;
+    }
+
+    public Date getDueTimeAsSimpleDate() throws ParseException {
+        return new SimpleDateFormat("hh:mm aa").parse(dueTime);
     }
 
     public void setDueTime(String dueTime) {
@@ -112,9 +119,5 @@ public class Task {
 
     public void setComplete(boolean complete) {
         this.complete = complete;
-    }
-
-    public String getDueDateString() {
-        return dueDate;
     }
 }
