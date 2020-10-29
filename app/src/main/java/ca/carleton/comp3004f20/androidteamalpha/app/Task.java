@@ -1,14 +1,9 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
 import java.util.Date;
+import java.util.Locale;
 
 public class Task {
 
@@ -72,7 +67,7 @@ public class Task {
     }
 
     public Date getDueDate() throws ParseException {
-        return new SimpleDateFormat("MMM dd yyyy").parse(dueDate);
+        return new SimpleDateFormat("MMM dd yyyy", Locale.CANADA).parse(dueDate);
     }
 
     public void setDueDate(String dueDate) {
@@ -80,7 +75,7 @@ public class Task {
     }
 
     public Date getDueTime() throws ParseException {
-        return new SimpleDateFormat("hh:mm aa").parse(dueTime);
+        return new SimpleDateFormat("hh:mm aa", Locale.CANADA).parse(dueTime);
     }
 
     public void setDueTime(String dueTime) {
@@ -117,5 +112,9 @@ public class Task {
 
     public void setComplete(boolean complete) {
         this.complete = complete;
+    }
+
+    public String getDueDateString() {
+        return dueDate;
     }
 }

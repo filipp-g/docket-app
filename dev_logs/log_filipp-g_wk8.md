@@ -1,0 +1,2 @@
+- Add Projects List Activity
+- Add generic RecyclerView for Tasks
