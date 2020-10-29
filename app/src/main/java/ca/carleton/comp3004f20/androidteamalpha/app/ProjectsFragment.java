@@ -11,7 +11,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
+
+import android.widget.Button;
+import android.widget.HorizontalScrollView;
+import android.widget.ImageButton;
+import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
@@ -94,5 +104,37 @@ public class ProjectsFragment extends Fragment {
 
     private void getNum(DataSnapshot dataSnapshot) {
         numOfTasks = (int) dataSnapshot.getChildrenCount();
+
+        HorizontalScrollView scrollView = (HorizontalScrollView) getView().findViewById(R.id.scrollable);
+
+        LinearLayout mainLayout = new LinearLayout(getActivity());
+        mainLayout.setOrientation(LinearLayout.VERTICAL);
+        final LinearLayout topLayout = new LinearLayout(getActivity());
+        topLayout.setOrientation(LinearLayout.HORIZONTAL);
+        LinearLayout bottomLayout = new LinearLayout(getActivity());
+        bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
+
+        for (DataSnapshot task : dataSnapshot.getChildren()) {
+            Button newButton = new Button(getActivity());
+            newButton.setId(counter);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(370,370);
+            params.leftMargin = 40;
+            params.topMargin = 40;
+
+            newButton.setLayoutParams(params);
+            newButton.setText(task.child("name").getValue().toString());
+
+            if (counter % 2 == 0) {
+                topLayout.addView(newButton);
+            } else {
+                bottomLayout.addView(newButton);
+            }
+            counter++;
+        }
+
+        mainLayout.addView(topLayout);
+        mainLayout.addView(bottomLayout);
+
+        scrollView.addView(mainLayout);
     }
 }
