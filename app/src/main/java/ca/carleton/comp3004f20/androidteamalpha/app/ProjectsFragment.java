@@ -76,6 +76,19 @@ public class ProjectsFragment extends Fragment {
                 }
             });
         }
+
+        FirebaseDatabase.getInstance().getReference().child(user).child("tasks")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        getNum(dataSnapshot);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+
         return view;
     }
 
