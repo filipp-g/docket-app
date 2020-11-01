@@ -2,3 +2,4 @@
 - Add generic RecyclerView for Tasks
 - Convert Projects list to Fragment
 - Figure out retrieving data from Firebase
+- Improve Projects List UI

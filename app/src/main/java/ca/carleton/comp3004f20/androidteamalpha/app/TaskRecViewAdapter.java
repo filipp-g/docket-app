@@ -1,5 +1,6 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -29,8 +30,13 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
     protected void onBindViewHolder(@NonNull ViewHolder viewHolder, int i, @NonNull Task task) {
         viewHolder.taskComplete.setChecked(task.isComplete());
         viewHolder.txtTaskName.setText(task.getName());
-        viewHolder.txtDueDate.setText(task.getDueDate());
-//        viewHolder.txtTimeLeft.setText(task.getTimeSpent());     //TODO for some reason this throws exception
+        viewHolder.txtDueDate.setText("Due: " + task.getDueDate());
+
+        int timeDiff = task.getTimeSpent() - task.getTimeRequired();
+        if (timeDiff < 0) {
+            viewHolder.txtTimeLeft.setText(timeDiff + "h");
+            viewHolder.txtTimeLeft.setTextColor(Color.RED);
+        }
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

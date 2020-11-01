@@ -21,10 +21,6 @@ public class ProjectsFragment extends Fragment {
     private static final String EMAIL = "email";
     private static final String USER = "user";
 
-    private DatabaseReference taskDatabase;
-    private TaskRecViewAdapter adapter;
-    private RecyclerView projectsRecView;
-
     private String user;
     private String email;
 
@@ -58,7 +54,7 @@ public class ProjectsFragment extends Fragment {
                 user = getArguments().getString(USER);
             }
 
-            taskDatabase = FirebaseDatabase.getInstance().getReference().child(user);
+            DatabaseReference taskDatabase = FirebaseDatabase.getInstance().getReference().child(user);
             Query query = taskDatabase.child("tasks");
 
             FirebaseRecyclerOptions<Task> options = new FirebaseRecyclerOptions.Builder<Task>()
@@ -66,19 +62,18 @@ public class ProjectsFragment extends Fragment {
                     .setLifecycleOwner(this)
                     .build();
 
-            adapter = new TaskRecViewAdapter(options);
+            TaskRecViewAdapter adapter = new TaskRecViewAdapter(options);
 
-            projectsRecView = view.findViewById(R.id.projectsRecView);
+            RecyclerView projectsRecView = view.findViewById(R.id.projectsRecView);
             projectsRecView.setAdapter(adapter);
             projectsRecView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-            Button addTask = (Button) view.findViewById(R.id.btnAddTask);
-            addTask.setOnClickListener(v ->
-                    getActivity()
-                            .getSupportFragmentManager()
-                            .beginTransaction()
-                            .replace(R.id.container, TaskFragment.newInstance(email, user))
-                            .commit()
+            Button addTask = view.findViewById(R.id.btnAddTask);
+            addTask.setOnClickListener(v -> getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, TaskFragment.newInstance(email, user))
+                    .commit()
             );
         }
         return view;
