@@ -1,6 +1,6 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.app.Activity;
+import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -16,6 +16,7 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
@@ -103,8 +104,13 @@ public class TaskFragment extends Fragment {
 
         saveButton = view.findViewById(R.id.btnSave);
         saveButton.setOnClickListener(f -> saveTask());
+
         deleteButton = view.findViewById(R.id.btnDelete);
-        deleteButton.setOnClickListener(f -> deleteTask());
+        if (task == null) {
+            deleteButton.setVisibility(View.INVISIBLE);
+        } else {
+            deleteButton.setOnClickListener(f -> deleteTask());
+        }
     }
 
 
@@ -172,16 +178,18 @@ public class TaskFragment extends Fragment {
         }
     }
 
-    private void launchProjectsFragment() {
-        getActivity()
-                .getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, ProjectsFragment.newInstance(email, user))
-                .commit();
-    }
-
     private void deleteTask() {
-        //TODO once we have saving figured out
+        new AlertDialog.Builder(getContext())
+                .setMessage("Are you sure you want to delete " + task.getName() + "?")
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes,
+                        (dialog, whichButton) -> {
+                            taskDatabase.child(task.getId()).removeValue();     //TODO can add a completionListener if needed
+                            Toast.makeText(getContext(), task.getName() + " deleted", Toast.LENGTH_SHORT).show();
+                            launchProjectsFragment();
+                        }
+                )
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
     private void showDatePickerDialog() {
@@ -203,6 +211,7 @@ public class TaskFragment extends Fragment {
             this.shortMonths = new DateFormatSymbols().getShortMonths();
         }
 
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             int year, month, day;
@@ -234,6 +243,7 @@ public class TaskFragment extends Fragment {
             this.mEditText = mEditText;
         }
 
+        @NonNull
         @Override
         public Dialog onCreateDialog(Bundle savedInstanceState) {
             int hour, minute;
@@ -252,5 +262,13 @@ public class TaskFragment extends Fragment {
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             mEditText.setText(String.format(Locale.CANADA, "%02d:%02d", hourOfDay, minute));
         }
+    }
+
+    private void launchProjectsFragment() {
+        getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, ProjectsFragment.newInstance(email, user))
+                .commit();
     }
 }
