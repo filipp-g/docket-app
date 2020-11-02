@@ -4,14 +4,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
-import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.RequiresApi;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,14 +16,12 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+
 import com.google.android.material.switchmaterial.SwitchMaterial;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -51,7 +42,6 @@ public class TaskFragment extends Fragment {
     private String email;
     private String user;
 
-    private String USERNAME;
     private DatabaseReference taskDatabase;
 
     private Spinner projectSpinner;
@@ -78,8 +68,7 @@ public class TaskFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_task, container, false);
 
@@ -156,10 +145,14 @@ public class TaskFragment extends Fragment {
                         timeReq, timeSpent, complete),
                 (error, ref) -> {
                     if (error == null) {
-                        Toast.makeText(getActivity().getApplicationContext(), "Task saved", Toast.LENGTH_SHORT).show();
-                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ProjectsFragment.newInstance(email, user)).commit();
+                        Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
+                        getActivity()
+                                .getSupportFragmentManager()
+                                .beginTransaction()
+                                .replace(R.id.container, ProjectsFragment.newInstance(email, user))
+                                .commit();
                     } else {
-                        Toast.makeText(getActivity().getApplicationContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
         );

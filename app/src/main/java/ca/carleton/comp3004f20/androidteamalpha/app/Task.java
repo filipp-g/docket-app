@@ -1,16 +1,9 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.os.Build;
-
-import androidx.annotation.RequiresApi;
-
-import com.google.firebase.database.DataSnapshot;
-
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalTime;
 import java.util.Date;
+import java.util.Locale;
 
 public class Task {
 
@@ -73,24 +66,24 @@ public class Task {
         this.projectId = projectId;
     }
 
-    public String getDueDate() throws ParseException {
+    public String getDueDate() {
         return dueDate;
     }
 
-    public Date getDueDateAsDateFormat() throws ParseException {
-        return new SimpleDateFormat("MMM dd yyyy").parse(dueDate);
+    public Date getDueDateAsSimpleDate() throws ParseException {
+        return new SimpleDateFormat("MMM dd yyyy", Locale.CANADA).parse(dueDate);
     }
 
     public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
 
-    public String getDueTime() throws ParseException {
+    public String getDueTime() {
         return dueTime;
     }
 
     public Date getDueTimeAsSimpleDate() throws ParseException {
-        return new SimpleDateFormat("hh:mm aa").parse(dueTime);
+        return new SimpleDateFormat("hh:mm aa", Locale.CANADA).parse(dueTime);
     }
 
     public void setDueTime(String dueTime) {

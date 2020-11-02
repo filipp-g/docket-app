@@ -183,7 +183,7 @@ public class CalendarFragment extends Fragment {
                         weight, time_required, time_spent, complete);
                 CalenderEvent calenderEvent = new CalenderEvent();
                 calenderEvent.setTask(taskObject);
-                calenderEvent.setEndEvent(taskObject.getDueDateAsDateFormat());
+                calenderEvent.setEndEvent(taskObject.getDueDateAsSimpleDate());
                 calenderListOfEvents.add(calenderEvent);
             } catch (ParseException e) {
                 e.printStackTrace();
