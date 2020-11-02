@@ -91,7 +91,7 @@ public class ProjectsFragment extends Fragment {
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            getNum(dataSnapshot);
+
                         }
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
@@ -102,39 +102,5 @@ public class ProjectsFragment extends Fragment {
         return view;
     }
 
-    private void getNum(DataSnapshot dataSnapshot) {
-        numOfTasks = (int) dataSnapshot.getChildrenCount();
 
-        HorizontalScrollView scrollView = (HorizontalScrollView) getView().findViewById(R.id.scrollable);
-
-        LinearLayout mainLayout = new LinearLayout(getActivity());
-        mainLayout.setOrientation(LinearLayout.VERTICAL);
-        final LinearLayout topLayout = new LinearLayout(getActivity());
-        topLayout.setOrientation(LinearLayout.HORIZONTAL);
-        LinearLayout bottomLayout = new LinearLayout(getActivity());
-        bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
-
-        for (DataSnapshot task : dataSnapshot.getChildren()) {
-            Button newButton = new Button(getActivity());
-            newButton.setId(counter);
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(370,370);
-            params.leftMargin = 40;
-            params.topMargin = 40;
-
-            newButton.setLayoutParams(params);
-            newButton.setText(task.child("name").getValue().toString());
-
-            if (counter % 2 == 0) {
-                topLayout.addView(newButton);
-            } else {
-                bottomLayout.addView(newButton);
-            }
-            counter++;
-        }
-
-        mainLayout.addView(topLayout);
-        mainLayout.addView(bottomLayout);
-
-        scrollView.addView(mainLayout);
-    }
 }
