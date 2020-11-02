@@ -133,20 +133,20 @@ public class CalenderActivity extends AppCompatActivity {
         for (DataSnapshot task : snapshot.getChildren()) {
             String completeString = task.child("complete").getValue().toString();
             boolean complete = Boolean.parseBoolean(completeString);
-            String due_time  = task.child("due_Time").getValue().toString();
-            String due_date = task.child("due_date").getValue().toString();
-            String task_id = task.child("task_id").getValue().toString();
-            String task_name  = task.child("task_name").getValue().toString();
-            String projectId = task.child("project_id").getValue().toString();
-            int time_required  = Integer.parseInt(task.child("time_required").getValue().toString());
-            int time_spent = Integer.parseInt(task.child("time_spent").getValue().toString());
+            String due_time  = task.child("dueTime").getValue().toString();
+            String due_date = task.child("dueDate").getValue().toString();
+            String task_id = task.child("id").getValue().toString();
+            String task_name  = task.child("name").getValue().toString();
+            String projectId = task.child("projectId").getValue().toString();
+            int time_required  = Integer.parseInt(task.child("timeRequired").getValue().toString());
+            int time_spent = Integer.parseInt(task.child("timeSpent").getValue().toString());
             int weight  = Integer.parseInt(task.child("weight").getValue().toString());
             try {
                 Task taskObject = new Task(task_id, task_name, projectId, due_date, due_time,
                         weight, time_required, time_spent, complete);
                 CalenderEvent calenderEvent = new CalenderEvent();
                 calenderEvent.setTask(taskObject);
-                calenderEvent.setEndEvent(taskObject.getDueDateAsSimpleDate());
+                calenderEvent.setEndEvent(taskObject.getDueDateAsDateFormat());
                 calenderListOfEvents.add(calenderEvent);
             } catch (ParseException e) {
                 e.printStackTrace();

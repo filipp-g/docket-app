@@ -19,6 +19,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
@@ -92,6 +93,7 @@ public class CalendarFragment extends Fragment {
             if (getArguments() != null) {
                 email = getArguments().getString(EMAIL);
                 user = getArguments().getString(USER);
+                userName = user;
             }
 
             final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
@@ -128,6 +130,14 @@ public class CalendarFragment extends Fragment {
                 }
             };
 
+            Button addTask = (Button) view.findViewById(R.id.btnAddTask);
+            addTask.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, TaskFragment.newInstance(email, user)).commit();
+                }
+            });
+
             compactCalendar.setListener(new CompactCalendarView.CompactCalendarViewListener() {
                 @Override
                 public void onDayClick(Date dateClicked) {
@@ -142,11 +152,12 @@ public class CalendarFragment extends Fragment {
                 }
             });
 
-            ImageButton backButton = (ImageButton) view.findViewById(R.id.backButton);
-            backButton.setOnClickListener(new View.OnClickListener() {
+            ImageButton overViewButton = (ImageButton) view.findViewById(R.id.overviewButton);
+            overViewButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ProjectsFragment.newInstance(email, user)).commit();
+                    Fragment fragment = OverviewFragment.newInstance(email, userName);
+                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
                 }
             });
         }
@@ -172,7 +183,7 @@ public class CalendarFragment extends Fragment {
                         weight, time_required, time_spent, complete);
                 CalenderEvent calenderEvent = new CalenderEvent();
                 calenderEvent.setTask(taskObject);
-                calenderEvent.setEndEvent(taskObject.getDueDateAsSimpleDate());
+                calenderEvent.setEndEvent(taskObject.getDueDateAsDateFormat());
                 calenderListOfEvents.add(calenderEvent);
             } catch (ParseException e) {
                 e.printStackTrace();

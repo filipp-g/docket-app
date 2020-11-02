@@ -80,6 +80,9 @@ public class MainMenu extends AppCompatActivity {
             }
         });
 
+        DatabaseReference ref = FirebaseDatabase.getInstance().getReference().child("users");
+        ref.child("-MKLL81f_TWtDhdUqy9B").child("name").setValue("michael");
+
         HorizontalScrollView scrollView = findViewById(R.id.scrollable);
 
         LinearLayout mainLayout = new LinearLayout(this);
@@ -138,6 +141,7 @@ public class MainMenu extends AppCompatActivity {
             String emailFromDatabase = user.child("email").getValue().toString();
             if (emailFromDatabase.equals(email)) {
                 name = user.child("name").getValue().toString();
+                break;
             }
         }
 
