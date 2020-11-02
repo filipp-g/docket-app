@@ -66,12 +66,12 @@ public class OverviewFragment extends Fragment {
             }
 
             Button addTask = (Button) view.findViewById(R.id.btnAddTask);
-            addTask.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, TaskFragment.newInstance(email, user)).commit();
-                }
-            });
+            addTask.setOnClickListener(v -> getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, TaskFragment.newInstance(email, user, null))
+                    .commit()
+            );
 
             FirebaseDatabase.getInstance().getReference().child(user).child("tasks")
                     .addListenerForSingleValueEvent(new ValueEventListener() {

@@ -1,6 +1,6 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.app.AlertDialog;
+import android.app.Activity;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -30,17 +30,14 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TaskFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TaskFragment extends Fragment {
     private static final String EMAIL = "email";
-    private static final String USER= "user";
+    private static final String USER = "user";
+    private static final String TASK = "taskObj";
 
     private String email;
     private String user;
+    private Task task;
 
     private DatabaseReference taskDatabase;
 
@@ -53,11 +50,12 @@ public class TaskFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TaskFragment newInstance(String email, String user) {
+    public static TaskFragment newInstance(String email, String user, Task task) {
         TaskFragment fragment = new TaskFragment();
         Bundle args = new Bundle();
         args.putString(EMAIL, email);
         args.putString(USER, user);
+        args.putSerializable(TASK, task);
         fragment.setArguments(args);
         return fragment;
     }
@@ -69,16 +67,22 @@ public class TaskFragment extends Fragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_task, container, false);
 
         if (getArguments() != null) {
             email = getArguments().getString(EMAIL);
             user = getArguments().getString(USER);
+            task = (Task) getArguments().getSerializable(TASK);
         }
 
         taskDatabase = FirebaseDatabase.getInstance().getReference().child(user).child("tasks");
         initElements(view);
+
+        if (task == null) {
+            task = new Task();
+        } else {
+            populateTask(task);
+        }
 
         return view;
     }
@@ -107,55 +111,73 @@ public class TaskFragment extends Fragment {
     private void populateProjects(View view) {
         List<String> projectList = new ArrayList<>();
         projectList.add("long name project");
-        projectList.add("comp3203");
+        projectList.add("comp3203");        //TODO put real projects
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                getActivity(), android.R.layout.simple_spinner_item, projectList);
+                getActivity(), android.R.layout.simple_spinner_item, projectList
+        );
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         projectSpinner = view.findViewById(R.id.spinnerProjects);
         projectSpinner.setAdapter(adapter);
     }
 
+    private void populateTask(Task task) {
+        nameEdit.setText(task.getName());
+//        projectSpinner            //TODO set project name
+        dueDateEdit.setText(task.getDueDate());
+        dueTimeEdit.setText(task.getDueTime());
+        weightEdit.setText("" + task.getWeight());
+        timeReqEdit.setText("" + task.getTimeRequired());
+        timeSpentEdit.setText("" + task.getTimeSpent());
+        completeSwitch.setChecked(task.isComplete());
+    }
+
     private void saveTask() {
-        String name = nameEdit.getText().toString();
-        if (name.isEmpty()) {
+        task.setName(nameEdit.getText().toString());
+        if (task.getName().isEmpty()) {
             nameEdit.setError("Name is required");
             return;
         }
-        String project = projectSpinner.getSelectedItem().toString();
-        String dueDate = dueDateEdit.getText().toString();
-        String dueTime = dueTimeEdit.getText().toString();
+        task.setProjectId(projectSpinner.getSelectedItem().toString());
+        task.setDueDate(dueDateEdit.getText().toString());
+        task.setDueTime(dueTimeEdit.getText().toString());
 
-        int weight = 0, timeReq = 0, timeSpent = 0;
         if (!weightEdit.getText().toString().isEmpty()) {
-            weight = Integer.parseInt(weightEdit.getText().toString());
+            task.setWeight(Integer.parseInt(weightEdit.getText().toString()));
         }
         if (!timeReqEdit.getText().toString().isEmpty()) {
-            timeReq = Integer.parseInt(timeReqEdit.getText().toString());
+            task.setTimeRequired(Integer.parseInt(timeReqEdit.getText().toString()));
         }
         if (!timeSpentEdit.getText().toString().isEmpty()) {
-            timeSpent = Integer.parseInt(timeSpentEdit.getText().toString());
+            task.setTimeSpent(Integer.parseInt(timeSpentEdit.getText().toString()));
         }
-        boolean complete = completeSwitch.isChecked();
+        task.setComplete(completeSwitch.isChecked());
 
-        DatabaseReference pushRef = taskDatabase.push();
-        pushRef.setValue(
-                new Task(pushRef.getKey(), name, project, dueDate, dueTime, weight,
-                        timeReq, timeSpent, complete),
-                (error, ref) -> {
-                    if (error == null) {
-                        Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
-                        getActivity()
-                                .getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.container, ProjectsFragment.newInstance(email, user))
-                                .commit();
-                    } else {
-                        Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+        if (task.getId().isEmpty()) {
+            DatabaseReference pushRef = taskDatabase.push();
+            task.setId(pushRef.getKey());
+            pushRef.setValue(task, (error, ref) -> {
+                        if (error == null) {
+                            Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
+                            launchProjectsFragment();
+                        } else {
+                            Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                        }
                     }
-                }
-        );
+            );
+        } else {
+            taskDatabase.child(task.getId()).setValue(task);
+            launchProjectsFragment();
+        }
+    }
+
+    private void launchProjectsFragment() {
+        getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, ProjectsFragment.newInstance(email, user))
+                .commit();
     }
 
     private void deleteTask() {
@@ -195,7 +217,7 @@ public class TaskFragment extends Fragment {
                 month = Arrays.asList(shortMonths).indexOf(text.substring(0, 3));
                 day = Integer.parseInt(text.substring(4, 6));
             }
-            return new DatePickerDialog(getActivity(), AlertDialog.THEME_HOLO_LIGHT, this, year, month, day);
+            return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
@@ -224,15 +246,11 @@ public class TaskFragment extends Fragment {
                 hour = Integer.parseInt(text.substring(0, text.indexOf(":")));
                 minute = Integer.parseInt(text.substring(text.indexOf(":") + 1, text.indexOf(":") + 3));
             }
-            return new TimePickerDialog(getActivity(), AlertDialog.THEME_HOLO_LIGHT,
-                    this, hour, minute, false);
+            return new TimePickerDialog(getActivity(), this, hour, minute, false);
         }
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            String AMPM = hourOfDay > 12 ? "PM" : "AM";     //TODO fix AM/PM issue
-            mEditText.setText(
-                    String.format(Locale.CANADA, "%d:%02d %s", hourOfDay % 12, minute, AMPM)
-            );
+            mEditText.setText(String.format(Locale.CANADA, "%02d:%02d", hourOfDay, minute));
         }
     }
 }

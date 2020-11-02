@@ -1,11 +1,14 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import com.google.firebase.database.Exclude;
+
+import java.io.Serializable;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
 
-public class Task {
+public class Task implements Serializable {
 
     private String id;
     private String name;
@@ -70,6 +73,7 @@ public class Task {
         return dueDate;
     }
 
+    @Exclude
     public Date getDueDateAsSimpleDate() throws ParseException {
         return new SimpleDateFormat("MMM dd yyyy", Locale.CANADA).parse(dueDate);
     }
@@ -82,6 +86,7 @@ public class Task {
         return dueTime;
     }
 
+    @Exclude
     public Date getDueTimeAsSimpleDate() throws ParseException {
         return new SimpleDateFormat("hh:mm aa", Locale.CANADA).parse(dueTime);
     }
@@ -120,5 +125,20 @@ public class Task {
 
     public void setComplete(boolean complete) {
         this.complete = complete;
+    }
+
+    @Override
+    public String toString() {
+        return "Task{" +
+                "id='" + id + '\'' +
+                ", name='" + name + '\'' +
+                ", projectId='" + projectId + '\'' +
+                ", dueDate='" + dueDate + '\'' +
+                ", dueTime='" + dueTime + '\'' +
+                ", weight=" + weight +
+                ", timeRequired=" + timeRequired +
+                ", timeSpent=" + timeSpent +
+                ", complete=" + complete +
+                '}';
     }
 }

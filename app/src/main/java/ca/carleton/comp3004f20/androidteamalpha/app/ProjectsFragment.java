@@ -62,7 +62,7 @@ public class ProjectsFragment extends Fragment {
                     .setLifecycleOwner(this)
                     .build();
 
-            TaskRecViewAdapter adapter = new TaskRecViewAdapter(options);
+            TaskRecViewAdapter adapter = new TaskRecViewAdapter(options, email, user);
 
             RecyclerView projectsRecView = view.findViewById(R.id.projectsRecView);
             projectsRecView.setAdapter(adapter);
@@ -72,7 +72,7 @@ public class ProjectsFragment extends Fragment {
             addTask.setOnClickListener(v -> getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container, TaskFragment.newInstance(email, user))
+                    .replace(R.id.container, TaskFragment.newInstance(email, user, null))
                     .commit()
             );
         }

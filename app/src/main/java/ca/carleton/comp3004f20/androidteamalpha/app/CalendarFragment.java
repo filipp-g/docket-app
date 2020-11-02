@@ -47,7 +47,7 @@ import java.util.Locale;
 public class CalendarFragment extends Fragment {
     private static final String TAG = "ViewDatabase";
     private static final String EMAIL = "email";
-    private static final String USER= "user";
+    private static final String USER = "user";
 
     private String email;
     private String user;
@@ -66,7 +66,7 @@ public class CalendarFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static CalendarFragment newInstance(String email, String user)  {
+    public static CalendarFragment newInstance(String email, String user) {
         CalendarFragment fragment = new CalendarFragment();
         Bundle args = new Bundle();
         args.putString(EMAIL, email);
@@ -96,7 +96,7 @@ public class CalendarFragment extends Fragment {
                 userName = user;
             }
 
-            final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+            final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             assert actionBar != null;
             actionBar.setDisplayHomeAsUpEnabled(false);
             actionBar.setTitle(null);
@@ -113,6 +113,7 @@ public class CalendarFragment extends Fragment {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             getEvents(dataSnapshot);
                         }
+
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                         }
@@ -130,13 +131,13 @@ public class CalendarFragment extends Fragment {
                 }
             };
 
-            Button addTask = (Button) view.findViewById(R.id.btnAddTask);
-            addTask.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, TaskFragment.newInstance(email, user)).commit();
-                }
-            });
+            Button addTask = view.findViewById(R.id.btnAddTask);
+            addTask.setOnClickListener(v -> getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, TaskFragment.newInstance(email, user, null))
+                    .commit()
+            );
 
             compactCalendar.setListener(new CompactCalendarView.CompactCalendarViewListener() {
                 @Override
@@ -170,14 +171,14 @@ public class CalendarFragment extends Fragment {
         for (DataSnapshot task : snapshot.getChildren()) {
             String completeString = task.child("complete").getValue().toString();
             boolean complete = Boolean.parseBoolean(completeString);
-            String due_time  = task.child("dueTime").getValue().toString();
+            String due_time = task.child("dueTime").getValue().toString();
             String due_date = task.child("dueDate").getValue().toString();
             String task_id = task.child("id").getValue().toString();
-            String task_name  = task.child("name").getValue().toString();
+            String task_name = task.child("name").getValue().toString();
             String projectId = task.child("projectId").getValue().toString();
-            int time_required  = Integer.parseInt(task.child("timeRequired").getValue().toString());
+            int time_required = Integer.parseInt(task.child("timeRequired").getValue().toString());
             int time_spent = Integer.parseInt(task.child("timeSpent").getValue().toString());
-            int weight  = Integer.parseInt(task.child("weight").getValue().toString());
+            int weight = Integer.parseInt(task.child("weight").getValue().toString());
             try {
                 Task taskObject = new Task(task_id, task_name, projectId, due_date, due_time,
                         weight, time_required, time_spent, complete);
