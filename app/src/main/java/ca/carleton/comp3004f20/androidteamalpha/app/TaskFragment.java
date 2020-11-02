@@ -116,11 +116,11 @@ public class TaskFragment extends Fragment {
 
     private void populateProjects(View view) {
         List<String> projectList = new ArrayList<>();
-        projectList.add("long name project");
+        projectList.add("super unnecessary long name project");
         projectList.add("comp3203");        //TODO put real projects
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                getActivity(), android.R.layout.simple_spinner_item, projectList
+                getActivity(), R.layout.projects_spinner_item, projectList
         );
 
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
