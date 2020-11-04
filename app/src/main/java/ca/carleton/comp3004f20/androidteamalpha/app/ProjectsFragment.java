@@ -5,13 +5,17 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -75,6 +79,38 @@ public class ProjectsFragment extends Fragment {
                     .replace(R.id.container, TaskFragment.newInstance(email, user, null))
                     .commit()
             );
+
+            Button deleteTask = view.findViewById(R.id.btnDeleteTask);
+            deleteTask.setOnClickListener(v -> {
+                int numberOfTasks = projectsRecView.getChildCount();
+                System.out.println(numberOfTasks);
+                int selectedTasks = 0;
+                for (int i = 0; i < numberOfTasks; i++) {
+                    View taskView = projectsRecView.getChildAt(i);
+                    TextView taskName = taskView.findViewById(R.id.txtTaskName);
+                    //System.out.println(taskName.getText());
+                    CheckBox checkBox = taskView.findViewById(R.id.chkBoxComplete);
+                    if (checkBox.isChecked()) {
+                        selectedTasks++;
+
+                        adapter.getRef(i).removeValue().addOnCompleteListener(
+                                new OnCompleteListener<Void>() {
+                                    @Override
+                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                                        if (task.isSuccessful()) {
+                                            System.out.println("Successfully deleted task " + taskName);
+                                        }
+                                    }
+                                }
+                        );
+                    }
+                }
+                if (selectedTasks == 0) {
+                    Toast.makeText(getActivity(), "No task selected...", Toast.LENGTH_SHORT).show();
+                } else {
+                    Toast.makeText(getActivity(), "Deleting " + selectedTasks + " tasks from list...", Toast.LENGTH_SHORT).show();
+                }
+            });
         }
         return view;
     }

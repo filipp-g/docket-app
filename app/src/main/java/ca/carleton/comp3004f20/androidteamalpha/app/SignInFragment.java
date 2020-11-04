@@ -1,8 +1,10 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -15,8 +17,11 @@ import android.widget.Toast;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -79,7 +84,29 @@ public class SignInFragment extends Fragment {
                     @Override
                     public void onComplete(@NonNull com.google.android.gms.tasks.Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, new ProfileFragment()).commit();
+                            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                                FirebaseDatabase.getInstance().getReference().child("users")
+                                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                                            @RequiresApi(api = Build.VERSION_CODES.O)
+                                            @Override
+                                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                                for (DataSnapshot user : dataSnapshot.getChildren()) {
+                                                    String emailFromDatabase = user.child("email").getValue().toString();
+                                                    if (emailFromDatabase.equals(email)) {
+                                                        String userName = user.child("name").getValue().toString();
+
+                                                        ((MainActivity) getActivity()).initializeParameters(email, userName);
+
+                                                        getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, ProfileFragment.newInstance(email, userName)).commit();
+                                                    }
+                                                }
+                                            }
+
+                                            @Override
+                                            public void onCancelled(DatabaseError databaseError) {
+                                            }
+                                        });
+                            }
                         } else {
                             Toast.makeText(getActivity(), "Invalid Username/Password...", Toast.LENGTH_SHORT).show();
                         }
