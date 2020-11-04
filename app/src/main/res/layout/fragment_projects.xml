@@ -13,11 +13,26 @@
         android:layout_marginTop="10dp" />
 
     <Button
-        android:id="@+id/btnAddTask"
+    android:id="@+id/btnAddTask"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_alignParentBottom="true"
+    android:layout_marginBottom="0dp"
+    android:layout_marginLeft="50dp"
+    android:minWidth="120dp"
+    android:text="add task" />
+
+    <Button
+        android:id="@+id/btnDeleteTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btnAddTask"
+        android:layout_alignBottom="@+id/btnAddTask"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:text="add task" />
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="70dp"
+        android:minWidth="120dp"
+        android:layout_toRightOf="@+id/btnAddTask"
+        android:text="delete task" />
 
 </RelativeLayout>

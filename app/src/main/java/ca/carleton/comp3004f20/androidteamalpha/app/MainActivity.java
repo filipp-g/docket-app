@@ -64,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView.OnNavigationItemSelectedListener bottomNavMethod = new BottomNavigationView.OnNavigationItemSelectedListener() {
         @Override
         public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            initialize();
-
             Fragment fragment = null;
 
             switch (item.getItemId()) {
@@ -95,17 +93,6 @@ public class MainActivity extends AppCompatActivity {
         return ProfileFragment.newInstance(email, userName);
     }
 
-    private void getName(DataSnapshot dataSnapshot) {
-        email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-
-        for (DataSnapshot user : dataSnapshot.getChildren()) {
-            String emailFromDatabase = user.child("email").getValue().toString();
-            if (emailFromDatabase.equals(email)) {
-                userName = user.child("name").getValue().toString();
-            }
-        }
-    }
-
     private void initialize() {
         if (FirebaseAuth.getInstance().getCurrentUser() != null) {
             FirebaseDatabase.getInstance().getReference().child("users")
@@ -113,7 +100,14 @@ public class MainActivity extends AppCompatActivity {
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            getName(dataSnapshot);
+                            email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
+
+                            for (DataSnapshot user : dataSnapshot.getChildren()) {
+                                String emailFromDatabase = user.child("email").getValue().toString();
+                                if (emailFromDatabase.equals(email)) {
+                                    userName = user.child("name").getValue().toString();
+                                }
+                            }
                         }
 
                         @Override
@@ -121,5 +115,10 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
         }
+    }
+
+    public void initializeParameters(String email, String userName) {
+        this.email = email;
+        this.userName = userName;
     }
 }
