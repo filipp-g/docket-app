@@ -34,7 +34,7 @@ public class OverviewFragment extends Fragment {
     int numOfTasks = 0;
 
     private OverviewViewModel mViewModel;
-    private String userName = "filipp";
+    private String userName = "";
 
     private String user;
     private String email;
@@ -112,7 +112,7 @@ public class OverviewFragment extends Fragment {
 
         LinearLayout mainLayout = new LinearLayout(getActivity());
         mainLayout.setOrientation(LinearLayout.VERTICAL);
-        final LinearLayout topLayout = new LinearLayout(getActivity());
+        LinearLayout topLayout = new LinearLayout(getActivity());
         topLayout.setOrientation(LinearLayout.HORIZONTAL);
         LinearLayout bottomLayout = new LinearLayout(getActivity());
         bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
