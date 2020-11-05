@@ -14,11 +14,9 @@
 
         <HorizontalScrollView
             android:id="@+id/horizontalScrollView"
-            android:layout_width="408dp"
-            android:layout_height="281dp"
-            android:layout_marginTop="4dp"
+            android:layout_width="413dp"
+            android:layout_height="287dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.333"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
@@ -42,11 +40,12 @@
             android:layout_height="51dp"
             android:layout_marginStart="32dp"
             android:layout_marginBottom="24dp"
-            android:src="@drawable/ic_launcher_foreground"
+            android:src="@color/common_google_signin_btn_text_dark_disabled"
             app:layout_constraintBottom_toBottomOf="@+id/btnAddTask"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/btnAddTask"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.0"
+            tools:src="@drawable/calender_icon" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 

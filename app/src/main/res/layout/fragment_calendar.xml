@@ -64,7 +64,8 @@
             android:src="@android:drawable/editbox_dropdown_dark_frame"
             app:layout_constraintBottom_toBottomOf="@+id/btnAddTask"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btnAddTask" />
+            app:layout_constraintTop_toTopOf="@+id/btnAddTask"
+            tools:src="@drawable/ic_overview" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
