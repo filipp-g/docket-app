@@ -1,5 +1,6 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import android.app.AlertDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +21,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+
+import java.util.ArrayList;
 
 public class ProjectsFragment extends Fragment {
     private static final String EMAIL = "email";
@@ -83,36 +86,54 @@ public class ProjectsFragment extends Fragment {
             Button deleteTask = view.findViewById(R.id.btnDeleteTask);
             deleteTask.setOnClickListener(v -> {
                 int numberOfTasks = projectsRecView.getChildCount();
-                System.out.println(numberOfTasks);
-                int selectedTasks = 0;
+                ArrayList<String> selectedTaskNames= new ArrayList<String>();
+                ArrayList<Integer> selectTaskPositions = new ArrayList<Integer>();
                 for (int i = 0; i < numberOfTasks; i++) {
                     View taskView = projectsRecView.getChildAt(i);
                     TextView taskName = taskView.findViewById(R.id.txtTaskName);
                     //System.out.println(taskName.getText());
                     CheckBox checkBox = taskView.findViewById(R.id.chkBoxComplete);
                     if (checkBox.isChecked()) {
-                        selectedTasks++;
-
-                        adapter.getRef(i).removeValue().addOnCompleteListener(
-                                new OnCompleteListener<Void>() {
-                                    @Override
-                                    public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
-                                        if (task.isSuccessful()) {
-                                            System.out.println("Successfully deleted task " + taskName);
-                                        }
-                                    }
-                                }
-                        );
+                        selectedTaskNames.add((String) taskName.getText());
+                        selectTaskPositions.add(i);
                     }
                 }
-                if (selectedTasks == 0) {
+                if (selectedTaskNames.isEmpty()) {
                     Toast.makeText(getActivity(), "No task selected...", Toast.LENGTH_SHORT).show();
                 } else {
-                    Toast.makeText(getActivity(), "Deleting " + selectedTasks + " tasks from list...", Toast.LENGTH_SHORT).show();
+                    deleteTasks(adapter, selectedTaskNames, selectTaskPositions);
                 }
             });
         }
         return view;
+    }
+
+    private void deleteTasks(TaskRecViewAdapter adapter, ArrayList<String> selectedTaskNames, ArrayList<Integer> selectTaskPositions) {
+        String message = "Are you sure you want to delete?\n";
+        for (String task: selectedTaskNames) {
+            message += task + "\n";
+        }
+
+        new AlertDialog.Builder(getContext())
+                .setMessage(message)
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setPositiveButton(android.R.string.yes,
+                        (dialog, whichButton) -> {
+                            for (Integer taskPosition : selectTaskPositions) {
+                                adapter.getRef(taskPosition).removeValue().addOnCompleteListener(
+                                        new OnCompleteListener<Void>() {
+                                            @Override
+                                            public void onComplete(@NonNull com.google.android.gms.tasks.Task<Void> task) {
+                                                if (task.isSuccessful()) {
+                                                    Toast.makeText(getActivity(), "Deleting tasks from list...", Toast.LENGTH_SHORT).show();
+                                                }
+                                            }
+                                        }
+                                );
+                            }
+                        }
+                )
+                .setNegativeButton(android.R.string.no, null).show();
     }
 
 }
