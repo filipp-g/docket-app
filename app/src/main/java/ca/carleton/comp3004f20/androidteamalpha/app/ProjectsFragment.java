@@ -74,7 +74,6 @@ public class ProjectsFragment extends Fragment {
             RecyclerView projectsRecView = view.findViewById(R.id.projectsRecView);
             projectsRecView.setAdapter(adapter);
             projectsRecView.setLayoutManager(new LinearLayoutManager(getContext()));
-
             Button addTask = view.findViewById(R.id.btnAddTask);
             addTask.setOnClickListener(v -> getActivity()
                     .getSupportFragmentManager()

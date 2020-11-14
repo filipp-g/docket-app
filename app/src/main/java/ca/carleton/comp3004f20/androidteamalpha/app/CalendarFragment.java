@@ -14,15 +14,18 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CalendarView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.firebase.auth.FirebaseAuth;
@@ -53,6 +56,7 @@ public class CalendarFragment extends Fragment {
     private String user;
 
     private CompactCalendarView compactCalendar;
+    private CalendarView calendarView;
     private NotificationManagerCompat notificationManager;
     private SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MMMM- yyyy", Locale.getDefault());
     private String userName = "filipp";
@@ -143,8 +147,24 @@ public class CalendarFragment extends Fragment {
                 @Override
                 public void onDayClick(Date dateClicked) {
                     Context context = getActivity().getApplicationContext();
-                    Toast.makeText(context, dateClicked.toString(), Toast.LENGTH_SHORT).show();
-                    System.out.println(dateClicked.getTime());
+                    FragmentActivity activity = (FragmentActivity) view.getContext();
+                    for (int counter = 0; counter < calenderListOfEvents.size(); counter++) {
+                       if (calenderListOfEvents.get(counter).getEndEventAslong().getTime() == dateClicked.getTime()) {
+                            activity.getSupportFragmentManager()
+                                    .beginTransaction()
+                                    .replace(R.id.container, TaskFragment.newInstance(
+                                            email, user, calenderListOfEvents.get(counter).getTask()))
+                                    .commit();
+                            Toast.makeText(context, "          " + calenderListOfEvents.get(counter).getTask().getName() + "\nDue Time: " +
+                                    calenderListOfEvents.get(counter).getTask().getDueTime(), Toast.LENGTH_SHORT).show();
+                            return;
+                       }
+                    }
+                    activity.getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container, TaskFragment.newInstance(email, user,
+                                    null))
+                            .commit();
                 }
 
                 @Override

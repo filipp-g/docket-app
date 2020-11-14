@@ -40,6 +40,10 @@ public class CalenderEvent {
         return end.getTime();
     }
 
+    public Date getEndEventAslong() {
+        return end;
+    }
+
     public Task getTask() {
         return task;
     }

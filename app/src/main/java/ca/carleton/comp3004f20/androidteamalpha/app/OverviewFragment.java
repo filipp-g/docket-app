@@ -118,8 +118,21 @@ public class OverviewFragment extends Fragment {
         bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
 
         for (DataSnapshot task : dataSnapshot.getChildren()) {
+            System.out.println(task.child("weight").getValue().toString());
+            Task taskObject = new Task(task.child("id").getValue().toString(),
+                    task.child("name").getValue().toString(), task.child("projectId").getValue().toString(),
+                    task.child("dueDate").getValue().toString(), task.child("dueTime").getValue().toString(),
+                    Integer.parseInt(task.child("weight").getValue().toString()),
+                    Integer.parseInt(task.child("timeRequired").getValue().toString()),
+                    Integer.parseInt(task.child("timeSpent").getValue().toString()),
+                    Boolean.parseBoolean(task.child("complete").getValue().toString()));
             Button newButton = new Button(getActivity());
             newButton.setId(counter);
+            newButton.setOnClickListener(view -> getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, TaskFragment.newInstance(email, user, taskObject))
+                    .commit());
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(370,370);
             params.leftMargin = 40;
             params.topMargin = 40;

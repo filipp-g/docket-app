@@ -10,8 +10,17 @@ public class CalenderEventList {
         listOfEvents.add(event);
     }
 
-    public CalenderEvent getEvent() {
-        final CalenderEvent calenderEvent = listOfEvents.get(listOfEvents.size());
-        return calenderEvent;
+    public void removeEvent(CalenderEvent event) { listOfEvents.remove(event); }
+
+    public CalenderEvent getEvent(int counter) {
+        if (0 <= counter && counter < listOfEvents.size()) {
+            final CalenderEvent calenderEvent = listOfEvents.get(listOfEvents.size());
+            return calenderEvent;
+        }
+        return null;
+    }
+
+    public int getSize() {
+        return listOfEvents.size();
     }
 }
