@@ -82,6 +82,8 @@ public class CalendarFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
     }
 
     @Override
@@ -106,7 +108,6 @@ public class CalendarFragment extends Fragment {
             actionBar.setTitle(null);
 
             compactCalendar = view.findViewById(R.id.compactcalendar_view);
-            compactCalendar.setUseThreeLetterAbbreviation(true);
 
             mAuth = FirebaseAuth.getInstance();
 
