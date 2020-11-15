@@ -118,7 +118,6 @@ public class OverviewFragment extends Fragment {
         bottomLayout.setOrientation(LinearLayout.HORIZONTAL);
 
         for (DataSnapshot task : dataSnapshot.getChildren()) {
-            System.out.println(task.child("weight").getValue().toString());
             Task taskObject = new Task(task.child("id").getValue().toString(),
                     task.child("name").getValue().toString(), task.child("projectId").getValue().toString(),
                     task.child("dueDate").getValue().toString(), task.child("dueTime").getValue().toString(),
@@ -133,9 +132,11 @@ public class OverviewFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.container, TaskFragment.newInstance(email, user, taskObject))
                     .commit());
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(370,370);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(500,500);
             params.leftMargin = 40;
             params.topMargin = 40;
+            params.rightMargin = 40;
+            params.bottomMargin = 40;
 
             newButton.setLayoutParams(params);
             newButton.setText(task.child("name").getValue().toString());

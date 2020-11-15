@@ -46,14 +46,11 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
 
         viewHolder.getView().setOnLongClickListener(view -> {
             FragmentActivity activity = (FragmentActivity) view.getContext();
-            System.out.println("view.getContext()");
-            System.out.println(view.getContext());
             activity.getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container, TaskFragment.newInstance(
                             email, user, this.getItem(viewHolder.getLayoutPosition())))
                     .commit();
-            System.out.println(viewHolder.getLayoutPosition());
             return true;
         });
     }

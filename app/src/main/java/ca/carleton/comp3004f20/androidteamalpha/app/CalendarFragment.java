@@ -4,6 +4,7 @@ import android.app.Notification;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
+import android.nfc.Tag;
 import android.os.Build;
 import android.os.Bundle;
 
@@ -161,10 +162,10 @@ public class CalendarFragment extends Fragment {
                             return;
                        }
                     }
+                    Task existingDate = new Task(dateClicked);
                     activity.getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.container, TaskFragment.newInstance(email, user,
-                                    null))
+                            .replace(R.id.container, TaskFragment.newInstance(email, user, existingDate))
                             .commit();
                 }
 

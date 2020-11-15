@@ -45,6 +45,19 @@ public class Task implements Serializable {
         this.complete = complete;
     }
 
+    public Task(Date date) {
+        this.id = "";
+        this.name = "";
+        this.projectId = "";
+        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy");
+        this.dueDate = dateFormat.format(date);
+        this.dueTime = "";
+        this.weight = 0;
+        this.timeRequired = 0;
+        this.timeSpent = 0;
+        this.complete = false;
+    }
+
     public String getId() {
         return id;
     }
