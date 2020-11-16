@@ -216,6 +216,7 @@ public class TaskFragment extends Fragment {
             } else {
                 year = Integer.parseInt(text.substring(7));
                 month = Arrays.asList(shortMonths).indexOf(text.substring(0, 3));
+                String dayAsString = text.substring(4, 6);
                 day = Integer.parseInt(text.substring(4, 6));
             }
             return new DatePickerDialog(getActivity(), this, year, month, day);

@@ -71,7 +71,6 @@ public class ProjectsFragment extends Fragment {
                 for (int i = 0; i < numberOfTasks; i++) {
                     View taskView = projectsRecView.getChildAt(i);
                     TextView taskName = taskView.findViewById(R.id.txtTaskName);
-                    //System.out.println(taskName.getText());
                     CheckBox checkBox = taskView.findViewById(R.id.chkBoxComplete);
                     if (checkBox.isChecked()) {
                         selectedTaskNames.add((String) taskName.getText());

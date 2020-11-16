@@ -6,7 +6,6 @@ import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -24,7 +23,6 @@ import android.widget.CalendarView;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
 import com.google.firebase.auth.FirebaseAuth;
@@ -64,8 +62,7 @@ public class CalendarFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
@@ -134,7 +131,7 @@ public class CalendarFragment extends Fragment {
                     }
                     activity.getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.container, TaskFragment.newInstance(null))
+                            .replace(R.id.container, TaskFragment.newInstance(new Task(dateClicked)))
                             .commit();
                 }
 

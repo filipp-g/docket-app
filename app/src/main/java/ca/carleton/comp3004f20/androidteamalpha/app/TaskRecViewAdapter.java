@@ -48,7 +48,6 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
                     .replace(R.id.container, TaskFragment.newInstance(
                             this.getItem(viewHolder.getLayoutPosition())))
                     .commit();
-            System.out.println(viewHolder.getLayoutPosition());
             return true;
         });
     }
