@@ -159,14 +159,13 @@ public class TaskFragment extends Fragment {
             DatabaseReference pushRef = taskDatabase.push();
             task.setId(pushRef.getKey());
             pushRef.setValue(task, (error, ref) -> {
-                        if (error == null) {
-                            Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
-                            launchProjectsFragment();
-                        } else {
-                            Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-            );
+                if (error == null) {
+                    Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
+                    launchProjectsFragment();
+                } else {
+                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         } else {
             taskDatabase.child(task.getId()).setValue(task);
             launchProjectsFragment();
@@ -177,13 +176,11 @@ public class TaskFragment extends Fragment {
         new AlertDialog.Builder(getContext())
                 .setMessage("Are you sure you want to delete " + task.getName() + "?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes,
-                        (dialog, whichButton) -> {
-                            taskDatabase.child(task.getId()).removeValue();     //TODO can add a completionListener if needed
-                            Toast.makeText(getContext(), task.getName() + " deleted", Toast.LENGTH_SHORT).show();
-                            launchProjectsFragment();
-                        }
-                )
+                .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                    taskDatabase.child(task.getId()).removeValue();     //TODO can add a completionListener if needed
+                    Toast.makeText(getContext(), task.getName() + " deleted", Toast.LENGTH_SHORT).show();
+                    launchProjectsFragment();
+                })
                 .setNegativeButton(android.R.string.no, null).show();
     }
 

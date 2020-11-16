@@ -54,7 +54,7 @@ public class SignInFragment extends Fragment {
         return view;
     }
 
-    public void sign_in(final FirebaseAuth mAuth, final String email, String password) {
+    public void sign_in(FirebaseAuth mAuth, String email, String password) {
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(getActivity(), task -> {
                     if (task.isSuccessful()) {

@@ -1,5 +1,9 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
@@ -25,6 +29,21 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, getProfileFragment()).commit();
+
+        Intent intent = new Intent(this, NotificationAlarmReceiver.class);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        // this triggers the alarm on app launch
+        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, alarmIntent);
+
+        //TODO scheduling notifications works but with ~5min delay, so not great for demos
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(System.currentTimeMillis());
+//        calendar.set(Calendar.HOUR_OF_DAY, 19);
+//        calendar.set(Calendar.MINUTE, 41);
+//        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+//                AlarmManager.INTERVAL_DAY, alarmIntent);
     }
 
     @Override
