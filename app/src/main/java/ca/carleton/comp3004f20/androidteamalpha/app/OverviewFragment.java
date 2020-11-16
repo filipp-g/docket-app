@@ -1,15 +1,7 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import androidx.annotation.RequiresApi;
-import androidx.lifecycle.ViewModelProviders;
-
 import android.os.Build;
 import android.os.Bundle;
-
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,6 +12,12 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.RequiresApi;
+import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModelProviders;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -27,26 +25,10 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 public class OverviewFragment extends Fragment {
-    private static final String EMAIL = "email";
-    private static final String USER= "user";
-
     int counter = 0;
     int numOfTasks = 0;
 
     private OverviewViewModel mViewModel;
-    private String userName = "";
-
-    private String user;
-    private String email;
-
-    public static OverviewFragment newInstance(String email, String user)  {
-        OverviewFragment fragment = new OverviewFragment();
-        Bundle args = new Bundle();
-        args.putString(EMAIL, email);
-        args.putString(USER, user);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
@@ -56,24 +38,25 @@ public class OverviewFragment extends Fragment {
         View view = inflater.inflate(R.layout.overview_fragment, container, false);
 
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
+            getActivity()
+                    .getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, new SignInFragment())
+                    .commit();
             Toast.makeText(getActivity(), "Please sign in...", Toast.LENGTH_SHORT).show();
         } else {
-            if (getArguments() != null) {
-                email = getArguments().getString(EMAIL);
-                user = getArguments().getString(USER);
-                userName = user;
-            }
-
             Button addTask = (Button) view.findViewById(R.id.btnAddTask);
             addTask.setOnClickListener(v -> getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container, TaskFragment.newInstance(email, user, null))
+                    .replace(R.id.container, TaskFragment.newInstance(null))
                     .commit()
             );
 
-            FirebaseDatabase.getInstance().getReference().child(user).child("tasks")
+            FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                    .child("tasks")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
@@ -90,7 +73,7 @@ public class OverviewFragment extends Fragment {
         overViewButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Fragment fragment = CalendarFragment.newInstance(email, userName);
+                Fragment fragment = new CalendarFragment();
                 getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
             }
         });
@@ -131,7 +114,7 @@ public class OverviewFragment extends Fragment {
             newButton.setOnClickListener(view -> getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container, TaskFragment.newInstance(email, user, taskObject))
+                    .replace(R.id.container, TaskFragment.newInstance(taskObject))
                     .commit());
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(370,370);
             params.leftMargin = 40;

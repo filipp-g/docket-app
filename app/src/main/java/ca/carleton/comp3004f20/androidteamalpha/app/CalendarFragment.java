@@ -2,7 +2,6 @@ package ca.carleton.comp3004f20.androidteamalpha.app;
 
 import android.app.Notification;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -42,24 +41,13 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link CalendarFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class CalendarFragment extends Fragment {
     private static final String TAG = "ViewDatabase";
-    private static final String EMAIL = "email";
-    private static final String USER = "user";
-
-    private String email;
-    private String user;
 
     private CompactCalendarView compactCalendar;
     private CalendarView calendarView;
     private NotificationManagerCompat notificationManager;
     private SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MMMM- yyyy", Locale.getDefault());
-    private String userName = "filipp";
 
     public List<CalenderEvent> calenderListOfEvents = new ArrayList<>();
 
@@ -70,20 +58,9 @@ public class CalendarFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static CalendarFragment newInstance(String email, String user) {
-        CalendarFragment fragment = new CalendarFragment();
-        Bundle args = new Bundle();
-        args.putString(EMAIL, email);
-        args.putString(USER, user);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-
     }
 
     @Override
@@ -96,12 +73,6 @@ public class CalendarFragment extends Fragment {
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
             Toast.makeText(getActivity(), "Please sign in...", Toast.LENGTH_SHORT).show();
         } else {
-            if (getArguments() != null) {
-                email = getArguments().getString(EMAIL);
-                user = getArguments().getString(USER);
-                userName = user;
-            }
-
             final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
             assert actionBar != null;
             actionBar.setDisplayHomeAsUpEnabled(false);
@@ -111,7 +82,10 @@ public class CalendarFragment extends Fragment {
 
             mAuth = FirebaseAuth.getInstance();
 
-            FirebaseDatabase.getInstance().getReference().child(user).child("tasks")
+            FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                    .child("tasks")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
@@ -124,15 +98,12 @@ public class CalendarFragment extends Fragment {
                         }
                     });
 
-            mAuthListener = new FirebaseAuth.AuthStateListener() {
-                @Override
-                public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth) {
-                    FirebaseUser user = firebaseAuth.getCurrentUser();
-                    if (user == null) {
-                        Log.d(TAG, "log in: " + user.getEmail());
-                    } else {
-                        Log.d(TAG, "log out: " + user.getEmail());
-                    }
+            mAuthListener = firebaseAuth -> {
+                FirebaseUser user = firebaseAuth.getCurrentUser();
+                if (user == null) {
+                    Log.d(TAG, "log in: " + user.getEmail());
+                } else {
+                    Log.d(TAG, "log out: " + user.getEmail());
                 }
             };
 
@@ -140,7 +111,7 @@ public class CalendarFragment extends Fragment {
             addTask.setOnClickListener(v -> getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container, TaskFragment.newInstance(email, user, null))
+                    .replace(R.id.container, TaskFragment.newInstance(null))
                     .commit()
             );
 
@@ -150,21 +121,20 @@ public class CalendarFragment extends Fragment {
                     Context context = getActivity().getApplicationContext();
                     FragmentActivity activity = (FragmentActivity) view.getContext();
                     for (int counter = 0; counter < calenderListOfEvents.size(); counter++) {
-                       if (calenderListOfEvents.get(counter).getEndEventAslong().getTime() == dateClicked.getTime()) {
+                        if (calenderListOfEvents.get(counter).getEndEventAslong().getTime() == dateClicked.getTime()) {
                             activity.getSupportFragmentManager()
                                     .beginTransaction()
                                     .replace(R.id.container, TaskFragment.newInstance(
-                                            email, user, calenderListOfEvents.get(counter).getTask()))
+                                            calenderListOfEvents.get(counter).getTask()))
                                     .commit();
                             Toast.makeText(context, "          " + calenderListOfEvents.get(counter).getTask().getName() + "\nDue Time: " +
                                     calenderListOfEvents.get(counter).getTask().getDueTime(), Toast.LENGTH_SHORT).show();
                             return;
-                       }
+                        }
                     }
                     activity.getSupportFragmentManager()
                             .beginTransaction()
-                            .replace(R.id.container, TaskFragment.newInstance(email, user,
-                                    null))
+                            .replace(R.id.container, TaskFragment.newInstance(null))
                             .commit();
                 }
 
@@ -175,13 +145,13 @@ public class CalendarFragment extends Fragment {
             });
 
             ImageButton overViewButton = (ImageButton) view.findViewById(R.id.overviewButton);
-            overViewButton.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Fragment fragment = OverviewFragment.newInstance(email, userName);
-                    getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
-                }
-            });
+            overViewButton.setOnClickListener(v ->
+                    getActivity()
+                            .getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.container, new OverviewFragment())
+                            .commit()
+            );
         }
         return view;
     }

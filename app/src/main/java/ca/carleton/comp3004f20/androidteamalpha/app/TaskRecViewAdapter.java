@@ -15,12 +15,9 @@ import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.firebase.ui.database.FirebaseRecyclerOptions;
 
 public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecViewAdapter.ViewHolder> {
-    private String user, email;
 
-    public TaskRecViewAdapter(@NonNull FirebaseRecyclerOptions<Task> options, String email, String user) {
+    public TaskRecViewAdapter(@NonNull FirebaseRecyclerOptions<Task> options) {
         super(options);
-        this.email = email;
-        this.user = user;
     }
 
     @NonNull
@@ -46,12 +43,10 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
 
         viewHolder.getView().setOnLongClickListener(view -> {
             FragmentActivity activity = (FragmentActivity) view.getContext();
-            System.out.println("view.getContext()");
-            System.out.println(view.getContext());
             activity.getSupportFragmentManager()
                     .beginTransaction()
                     .replace(R.id.container, TaskFragment.newInstance(
-                            email, user, this.getItem(viewHolder.getLayoutPosition())))
+                            this.getItem(viewHolder.getLayoutPosition())))
                     .commit();
             System.out.println(viewHolder.getLayoutPosition());
             return true;
