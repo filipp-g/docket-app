@@ -1,10 +1,13 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 
 import androidx.annotation.NonNull;
+import androidx.core.app.NotificationCompat;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
@@ -21,6 +24,9 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+        PendingIntent projectsIntent = PendingIntent.getActivity(context, 0,
+                new Intent(context, ProjectsFragment.class), PendingIntent.FLAG_UPDATE_CURRENT);
+
         FirebaseDatabase.getInstance()
                 .getReference()
                 .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
@@ -35,7 +41,7 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
                             calendar = setDueTime(calendar, task.child("dueTime").getValue().toString());
 
                             if (taskIsDueSoon(calendar)) {
-                                createNotification(task);
+                                createNotification(context, task, projectsIntent);
                             }
                         }
                     }
@@ -44,11 +50,20 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
                 });
     }
 
-    private void createNotification(DataSnapshot task) {
+    private void createNotification(Context context, DataSnapshot task, PendingIntent intent) {
         String name = task.child("name").getValue().toString();
         String dueDate = task.child("dueDate").getValue().toString();
         String dueTime = task.child("dueTime").getValue().toString();
-        System.out.println(name + " is due on " + dueDate + " at " + dueTime);
+        NotificationCompat.Builder builder = new NotificationCompat
+                .Builder(context, "DEFAULT_CHANNEL_ID")
+                .setSmallIcon(R.drawable.ic_projects)
+                .setContentTitle(name + " is due soon!")
+                .setContentText("Due: " + dueDate + " at " + dueTime)
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(intent)
+                .setAutoCancel(true);
+        ((NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE))
+                .notify(0, builder.build());
     }
 
     // task is due in less than 24 hours

@@ -1,6 +1,8 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
 import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
@@ -30,8 +32,10 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, getProfileFragment()).commit();
 
-        Intent intent = new Intent(this, NotificationAlarmReceiver.class);
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+        createNotificationChannel();
+
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0,
+                new Intent(this, NotificationAlarmReceiver.class), 0);
 
         AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
         // this triggers the alarm on app launch
@@ -93,4 +97,21 @@ public class MainActivity extends AppCompatActivity {
         }
         return new ProfileFragment();
     }
+
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "DEFAULT_CHANNEL_ID", "default",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription("The default notification channel");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
+        }
+    }
+
 }
