@@ -1,124 +1,117 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
+import android.app.AlarmManager;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Build;
+import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
-import android.os.Build;
-import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.Toast;
-
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
 public class MainActivity extends AppCompatActivity {
-    private BottomNavigationView bottomNavigationView;
-    private String userName;
-    private String email;
-
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        initialize();
-
-        bottomNavigationView = findViewById(R.id.bottom_navigation);
+        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
         getSupportFragmentManager().beginTransaction().replace(R.id.container, getProfileFragment()).commit();
+
+        createNotificationChannel();
+
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0,
+                new Intent(this, NotificationAlarmReceiver.class), 0);
+
+        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
+        // this triggers the alarm on app launch
+        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, alarmIntent);
+
+        //TODO scheduling notifications works but with ~5min delay, so not great for demos
+//        Calendar calendar = Calendar.getInstance();
+//        calendar.setTimeInMillis(System.currentTimeMillis());
+//        calendar.set(Calendar.HOUR_OF_DAY, 19);
+//        calendar.set(Calendar.MINUTE, 41);
+//        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+//                AlarmManager.INTERVAL_DAY, alarmIntent);
     }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflator = getMenuInflater();
-        inflator.inflate(R.menu.top_menu, menu);
+        getMenuInflater().inflate(R.menu.top_menu, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.menu_signout:
-                if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-                    FirebaseAuth.getInstance().signOut();
-                }
-                getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
-                Toast.makeText(this, "Signing Out", Toast.LENGTH_SHORT).show();
-                return true;
-
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    private BottomNavigationView.OnNavigationItemSelectedListener bottomNavMethod = new BottomNavigationView.OnNavigationItemSelectedListener() {
-        @Override
-        public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-            Fragment fragment = null;
-
-            switch (item.getItemId()) {
-                case R.id.nav_projects:
-                    fragment = ProjectsFragment.newInstance(email, userName);
-                    break;
-                case R.id.nav_overview:
-                    fragment = CalendarFragment.newInstance(email, userName);
-                    break;
-                case R.id.nav_timer:
-                    fragment = TimerFragment.newInstance(email, userName);
-                    break;
-                default:
-                    fragment = getProfileFragment();
-                    break;
+        if (item.getItemId() == R.id.menu_signout) {
+            if (FirebaseAuth.getInstance().getCurrentUser() != null) {
+                FirebaseAuth.getInstance().signOut();
             }
-
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+            getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
+            Toast.makeText(this, "Signing Out", Toast.LENGTH_SHORT).show();
             return true;
         }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private BottomNavigationView.OnNavigationItemSelectedListener bottomNavMethod = item -> {
+        Fragment fragment;
+
+        switch (item.getItemId()) {
+            case R.id.nav_projects:
+                fragment = new ProjectsFragment();
+                break;
+            case R.id.nav_overview:
+                fragment = new CalendarFragment();
+                break;
+            case R.id.nav_timer:
+                fragment = new TimerFragment();
+                break;
+            default:
+                fragment = getProfileFragment();
+                break;
+        }
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
+        return true;
     };
 
     private Fragment getProfileFragment() {
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            return SignInFragment.newInstance(email, userName);
+            return new SignInFragment();
         }
-        return ProfileFragment.newInstance(email, userName);
+        return new ProfileFragment();
     }
 
-    private void initialize() {
-        if (FirebaseAuth.getInstance().getCurrentUser() != null) {
-            FirebaseDatabase.getInstance().getReference().child("users")
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            email = FirebaseAuth.getInstance().getCurrentUser().getEmail();
-
-                            for (DataSnapshot user : dataSnapshot.getChildren()) {
-                                String emailFromDatabase = user.child("email").getValue().toString();
-                                if (emailFromDatabase.equals(email)) {
-                                    userName = user.child("name").getValue().toString();
-                                }
-                            }
-                        }
-
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
+    private void createNotificationChannel() {
+        // Create the NotificationChannel, but only on API 26+ because
+        // the NotificationChannel class is new and not in the support library
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "DEFAULT_CHANNEL_ID", "default",
+                    NotificationManager.IMPORTANCE_DEFAULT
+            );
+            channel.setDescription("The default notification channel");
+            // Register the channel with the system; you can't change the importance
+            // or other notification behaviors after this
+            NotificationManager notificationManager = getSystemService(NotificationManager.class);
+            notificationManager.createNotificationChannel(channel);
         }
     }
 
-    public void initializeParameters(String email, String userName) {
-        this.email = email;
-        this.userName = userName;
-    }
 }

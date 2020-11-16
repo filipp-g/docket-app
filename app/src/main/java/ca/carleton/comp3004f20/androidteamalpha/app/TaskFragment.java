@@ -21,6 +21,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -32,12 +33,7 @@ import java.util.List;
 import java.util.Locale;
 
 public class TaskFragment extends Fragment {
-    private static final String EMAIL = "email";
-    private static final String USER = "user";
     private static final String TASK = "taskObj";
-
-    private String email;
-    private String user;
     private Task task;
 
     private DatabaseReference taskDatabase;
@@ -51,11 +47,9 @@ public class TaskFragment extends Fragment {
         // Required empty public constructor
     }
 
-    public static TaskFragment newInstance(String email, String user, Task task) {
+    public static TaskFragment newInstance(Task task) {
         TaskFragment fragment = new TaskFragment();
         Bundle args = new Bundle();
-        args.putString(EMAIL, email);
-        args.putString(USER, user);
         args.putSerializable(TASK, task);
         fragment.setArguments(args);
         return fragment;
@@ -71,12 +65,13 @@ public class TaskFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_task, container, false);
 
         if (getArguments() != null) {
-            email = getArguments().getString(EMAIL);
-            user = getArguments().getString(USER);
             task = (Task) getArguments().getSerializable(TASK);
         }
 
-        taskDatabase = FirebaseDatabase.getInstance().getReference().child(user).child("tasks");
+        taskDatabase = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child("tasks");
         initElements(view);
 
         if (task == null) {
@@ -164,14 +159,13 @@ public class TaskFragment extends Fragment {
             DatabaseReference pushRef = taskDatabase.push();
             task.setId(pushRef.getKey());
             pushRef.setValue(task, (error, ref) -> {
-                        if (error == null) {
-                            Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
-                            launchProjectsFragment();
-                        } else {
-                            Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
-                        }
-                    }
-            );
+                if (error == null) {
+                    Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
+                    launchProjectsFragment();
+                } else {
+                    Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();
+                }
+            });
         } else {
             taskDatabase.child(task.getId()).setValue(task);
             launchProjectsFragment();
@@ -182,13 +176,11 @@ public class TaskFragment extends Fragment {
         new AlertDialog.Builder(getContext())
                 .setMessage("Are you sure you want to delete " + task.getName() + "?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes,
-                        (dialog, whichButton) -> {
-                            taskDatabase.child(task.getId()).removeValue();     //TODO can add a completionListener if needed
-                            Toast.makeText(getContext(), task.getName() + " deleted", Toast.LENGTH_SHORT).show();
-                            launchProjectsFragment();
-                        }
-                )
+                .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                    taskDatabase.child(task.getId()).removeValue();     //TODO can add a completionListener if needed
+                    Toast.makeText(getContext(), task.getName() + " deleted", Toast.LENGTH_SHORT).show();
+                    launchProjectsFragment();
+                })
                 .setNegativeButton(android.R.string.no, null).show();
     }
 
@@ -269,7 +261,7 @@ public class TaskFragment extends Fragment {
         getActivity()
                 .getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, ProjectsFragment.newInstance(email, user))
+                .replace(R.id.container, new ProjectsFragment())
                 .commit();
     }
 }
