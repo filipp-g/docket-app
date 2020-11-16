@@ -1,0 +1,3 @@
+- Refactor how users are handled throughout whole project
+- Begin working on notifications
+- Add notification scheduler
