@@ -1,0 +1,2 @@
+- delete all unused activities
+- refactor Add-Task UI to better fit on small screen
