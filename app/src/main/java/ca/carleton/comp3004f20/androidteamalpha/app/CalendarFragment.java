@@ -80,21 +80,29 @@ public class CalendarFragment extends Fragment {
 
             mAuth = FirebaseAuth.getInstance();
 
-            FirebaseDatabase.getInstance()
-                    .getReference()
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
-                    .child("tasks")
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            getEvents(dataSnapshot);
-                        }
+            System.out.println("-------------");
+            System.out.println(mAuth.getCurrentUser().getDisplayName());
+            System.out.println("-------------");
 
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
+            try {
+                FirebaseDatabase.getInstance()
+                        .getReference()
+                        .child(mAuth.getCurrentUser().getDisplayName())
+                        .child("tasks")
+                        .addListenerForSingleValueEvent(new ValueEventListener() {
+                            @RequiresApi(api = Build.VERSION_CODES.O)
+                            @Override
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                getEvents(dataSnapshot);
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+                            }
+                        });
+            } catch (Exception e) {
+
+            }
 
             mAuthListener = firebaseAuth -> {
                 FirebaseUser user = firebaseAuth.getCurrentUser();

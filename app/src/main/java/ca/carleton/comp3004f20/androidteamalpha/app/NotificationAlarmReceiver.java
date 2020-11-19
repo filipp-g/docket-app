@@ -27,7 +27,8 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
         PendingIntent projectsIntent = PendingIntent.getActivity(context, 0,
                 new Intent(context, ProjectsFragment.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        FirebaseDatabase.getInstance()
+        try {
+            FirebaseDatabase.getInstance()
                 .getReference()
                 .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
                 .child("tasks")
@@ -48,6 +49,9 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
                     @Override
                     public void onCancelled(@NonNull DatabaseError error) { }
                 });
+        } catch (Exception e) {
+
+        }
     }
 
     private void createNotification(Context context, DataSnapshot task, PendingIntent intent) {
