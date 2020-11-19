@@ -84,7 +84,6 @@ public class CalendarFragment extends Fragment {
             System.out.println(mAuth.getCurrentUser().getDisplayName());
             System.out.println("-------------");
 
-            try {
                 FirebaseDatabase.getInstance()
                         .getReference()
                         .child(mAuth.getCurrentUser().getDisplayName())
@@ -100,9 +99,6 @@ public class CalendarFragment extends Fragment {
                             public void onCancelled(DatabaseError databaseError) {
                             }
                         });
-            } catch (Exception e) {
-
-            }
 
             mAuthListener = firebaseAuth -> {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
