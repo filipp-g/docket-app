@@ -58,6 +58,7 @@ public class OverviewFragment extends Fragment {
                     .getReference()
                     .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
                     .child("tasks")
+                    .orderByChild("dueDate")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override

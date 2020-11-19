@@ -35,7 +35,7 @@ public class ProjectsFragment extends Fragment {
         DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
                 .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-        Query query = taskDatabase.child("tasks");
+        Query query = taskDatabase.child("tasks").orderByChild("dueDate");
 
         FirebaseRecyclerOptions<Task> options = new FirebaseRecyclerOptions.Builder<Task>()
                 .setQuery(query, Task.class)
@@ -88,17 +88,15 @@ public class ProjectsFragment extends Fragment {
         new AlertDialog.Builder(getContext())
                 .setMessage(message)
                 .setIcon(android.R.drawable.ic_dialog_alert)
-                .setPositiveButton(android.R.string.yes,
-                        (dialog, whichButton) -> {
-                            for (Integer taskPosition : selectTaskPositions) {
-                                adapter.getRef(taskPosition).removeValue().addOnCompleteListener(task -> {
-                                    if (task.isSuccessful()) {
-                                        Toast.makeText(getActivity(), "Deleting tasks from list...", Toast.LENGTH_SHORT).show();
-                                    }
-                                });
+                .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
+                    for (Integer taskPosition : selectTaskPositions) {
+                        adapter.getRef(taskPosition).removeValue().addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(getActivity(), "Deleting tasks from list...", Toast.LENGTH_SHORT).show();
                             }
-                        }
-                )
+                        });
+                    }
+                })
                 .setNegativeButton(android.R.string.no, null).show();
     }
 

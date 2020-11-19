@@ -33,7 +33,11 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, getProfileFragment()).commit();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, getInitialFragment())
+                .commit();
 
         createNotificationChannel();
 
@@ -85,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new TimerFragment();
                 break;
             default:
-                fragment = getProfileFragment();
+                fragment = new ProfileFragment();
                 break;
         }
 
@@ -93,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     };
 
-    private Fragment getProfileFragment() {
+    private Fragment getInitialFragment() {
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             return new SignInFragment();
         }

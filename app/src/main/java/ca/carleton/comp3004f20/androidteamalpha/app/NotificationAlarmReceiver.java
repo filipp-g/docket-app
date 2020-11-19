@@ -15,12 +15,9 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormatSymbols;
-import java.util.Arrays;
 import java.util.Calendar;
 
 public class NotificationAlarmReceiver extends BroadcastReceiver {
-    private final String[] shortMonths = new DateFormatSymbols().getShortMonths();
     private final int MILLIS_IN_HOUR = 3600000;
 
     @Override
@@ -37,7 +34,7 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
                 .getReference()
                 .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
                 .child("tasks")
-                .addValueEventListener(new ValueEventListener() {
+                .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
                         Calendar calendar = Calendar.getInstance();
@@ -58,13 +55,16 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
     private void createNotification(Context context, DataSnapshot task, PendingIntent intent) {
         String name = task.child("name").getValue().toString();
-        String dueDate = task.child("dueDate").getValue().toString();
+        String dueDateString = Utilities.formatReadableDate(task.child("dueDate").getValue().toString());
         String dueTime = task.child("dueTime").getValue().toString();
+        if (!dueTime.isEmpty()) {
+            dueDateString += " at " + dueTime;
+        }
         NotificationCompat.Builder builder = new NotificationCompat
                 .Builder(context, "DEFAULT_CHANNEL_ID")
                 .setSmallIcon(R.drawable.ic_projects)
                 .setContentTitle(name + " is due soon!")
-                .setContentText("Due: " + dueDate + " at " + dueTime)
+                .setContentText("Due: " + dueDateString)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(intent)
                 .setAutoCancel(true);
@@ -81,12 +81,9 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
     private Calendar setDueDate(Calendar calendar, String dueDate) {
         if (!dueDate.isEmpty()) {
-            int year = Integer.parseInt(dueDate.substring(7));
-            int month = Arrays.asList(shortMonths).indexOf(dueDate.substring(0, 3));
-            int day = Integer.parseInt(dueDate.substring(4, 6));
-            calendar.set(Calendar.YEAR, year);
-            calendar.set(Calendar.MONTH, month);
-            calendar.set(Calendar.DAY_OF_MONTH, day);
+            calendar.set(Calendar.YEAR, Integer.parseInt(dueDate.substring(0, 4)));
+            calendar.set(Calendar.MONTH, Integer.parseInt(dueDate.substring(5, 7)) - 1);
+            calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(dueDate.substring(8, 10)));
         }
         return calendar;
     }
