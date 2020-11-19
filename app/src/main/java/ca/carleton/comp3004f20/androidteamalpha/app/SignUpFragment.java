@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.fragment.app.Fragment;
@@ -31,11 +32,14 @@ public class SignUpFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
         mAuth = FirebaseAuth.getInstance();
 
+        ((MainActivity) getActivity()).hideBottomNav();
+
         final EditText emailId = view.findViewById(R.id.editTextTextEmailAddress);
         final EditText passwordId = view.findViewById(R.id.editTextTextPassword);
         final EditText nameId = view.findViewById(R.id.editTextTextName);
-        Button btnSignIn = view.findViewById(R.id.SignUp);
-        btnSignIn.setOnClickListener(v -> {
+
+        Button btnSignUp = view.findViewById(R.id.signUp);
+        btnSignUp.setOnClickListener(v -> {
             String email = emailId.getText().toString();
             String password = passwordId.getText().toString();
             String name = nameId.getText().toString();
@@ -45,6 +49,16 @@ public class SignUpFragment extends Fragment {
                 sign_up(mAuth, email, password, name);
             }
         });
+
+        Button cancel = view.findViewById(R.id.cancelBtn);
+        cancel.setOnClickListener(v ->
+                getActivity()
+                        .getSupportFragmentManager()
+                        .beginTransaction()
+                        .replace(R.id.container, new SignInFragment())
+                        .commit()
+        );
+
         return view;
     }
 
@@ -61,8 +75,9 @@ public class SignUpFragment extends Fragment {
                         getActivity()
                                 .getSupportFragmentManager()
                                 .beginTransaction()
-                                .replace(R.id.container, new SignInFragment())
+                                .replace(R.id.container, new ProfileFragment())
                                 .commit();
+                        ((MainActivity)getActivity()).showBottomNav();
                     } else {
                         Toast.makeText(getActivity(), "Failed to create new user", Toast.LENGTH_SHORT).show();
                     }

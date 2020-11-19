@@ -5,7 +5,6 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -15,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.firebase.ui.database.FirebaseRecyclerOptions;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -32,62 +32,54 @@ public class ProjectsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_projects, container, false);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            getActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, new SignInFragment())
-                    .commit();
-            Toast.makeText(getActivity(), "Please sign in...", Toast.LENGTH_SHORT).show();
-        } else {
-            DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
-                    .getReference()
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
-            Query query = taskDatabase.child("tasks");
+        DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+        Query query = taskDatabase.child("tasks");
 
-            FirebaseRecyclerOptions<Task> options = new FirebaseRecyclerOptions.Builder<Task>()
-                    .setQuery(query, Task.class)
-                    .setLifecycleOwner(this)
-                    .build();
+        FirebaseRecyclerOptions<Task> options = new FirebaseRecyclerOptions.Builder<Task>()
+                .setQuery(query, Task.class)
+                .setLifecycleOwner(this)
+                .build();
 
-            TaskRecViewAdapter adapter = new TaskRecViewAdapter(options);
+        TaskRecViewAdapter adapter = new TaskRecViewAdapter(options);
 
-            RecyclerView projectsRecView = view.findViewById(R.id.projectsRecView);
-            projectsRecView.setAdapter(adapter);
-            projectsRecView.setLayoutManager(new LinearLayoutManager(getContext()));
-            Button addTask = view.findViewById(R.id.btnAddTask);
-            addTask.setOnClickListener(v -> getActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, TaskFragment.newInstance(null))
-                    .commit()
-            );
+        RecyclerView projectsRecView = view.findViewById(R.id.projectsRecView);
+        projectsRecView.setAdapter(adapter);
+        projectsRecView.setLayoutManager(new LinearLayoutManager(getContext()));
+        FloatingActionButton addTask = view.findViewById(R.id.btnAddTask);
+        addTask.setOnClickListener(v -> getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, TaskFragment.newInstance(null))
+                .commit()
+        );
 
-            Button deleteTask = view.findViewById(R.id.btnDeleteTask);
-            deleteTask.setOnClickListener(v -> {
-                int numberOfTasks = projectsRecView.getChildCount();
-                ArrayList<String> selectedTaskNames = new ArrayList<String>();
-                ArrayList<Integer> selectTaskPositions = new ArrayList<Integer>();
-                for (int i = 0; i < numberOfTasks; i++) {
-                    View taskView = projectsRecView.getChildAt(i);
-                    TextView taskName = taskView.findViewById(R.id.txtTaskName);
-                    CheckBox checkBox = taskView.findViewById(R.id.chkBoxComplete);
-                    if (checkBox.isChecked()) {
-                        selectedTaskNames.add((String) taskName.getText());
-                        selectTaskPositions.add(i);
-                    }
+        FloatingActionButton deleteTask = view.findViewById(R.id.btnDeleteTask);
+        deleteTask.setOnClickListener(v -> {
+            int numberOfTasks = projectsRecView.getChildCount();
+            ArrayList<String> selectedTaskNames = new ArrayList<String>();
+            ArrayList<Integer> selectTaskPositions = new ArrayList<Integer>();
+            for (int i = 0; i < numberOfTasks; i++) {
+                View taskView = projectsRecView.getChildAt(i);
+                TextView taskName = taskView.findViewById(R.id.txtTaskName);
+                CheckBox checkBox = taskView.findViewById(R.id.chkBoxComplete);
+                if (checkBox.isChecked()) {
+                    selectedTaskNames.add((String) taskName.getText());
+                    selectTaskPositions.add(i);
                 }
-                if (selectedTaskNames.isEmpty()) {
-                    Toast.makeText(getActivity(), "No task selected...", Toast.LENGTH_SHORT).show();
-                } else {
-                    deleteTasks(adapter, selectedTaskNames, selectTaskPositions);
-                }
-            });
-        }
+            }
+            if (selectedTaskNames.isEmpty()) {
+                Toast.makeText(getActivity(), "No task selected...", Toast.LENGTH_SHORT).show();
+            } else {
+                deleteTasks(adapter, selectedTaskNames, selectTaskPositions);
+            }
+        });
         return view;
     }
 
-    private void deleteTasks(TaskRecViewAdapter adapter, ArrayList<String> selectedTaskNames, ArrayList<Integer> selectTaskPositions) {
+    private void deleteTasks(TaskRecViewAdapter adapter, ArrayList<String> selectedTaskNames,
+                             ArrayList<Integer> selectTaskPositions) {
         String message = "Are you sure you want to delete?\n";
         for (String task : selectedTaskNames) {
             message += task + "\n";

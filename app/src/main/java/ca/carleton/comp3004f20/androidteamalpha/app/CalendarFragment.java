@@ -25,6 +25,7 @@ import android.widget.Toast;
 
 import com.github.sundeepk.compactcalendarview.CompactCalendarView;
 import com.github.sundeepk.compactcalendarview.domain.Event;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -104,7 +105,7 @@ public class CalendarFragment extends Fragment {
                 }
             };
 
-            Button addTask = view.findViewById(R.id.btnAddTask);
+            FloatingActionButton addTask = view.findViewById(R.id.btnAddTask);
             addTask.setOnClickListener(v -> getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()

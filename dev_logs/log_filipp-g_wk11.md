@@ -1,1 +1,2 @@
 - Complete basic notifications
+- Sharpen up app-wide UI

@@ -21,9 +21,15 @@ import java.util.Calendar;
 
 public class NotificationAlarmReceiver extends BroadcastReceiver {
     private final String[] shortMonths = new DateFormatSymbols().getShortMonths();
+    private final int MILLIS_IN_HOUR = 3600000;
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            return;
+        }
+
         PendingIntent projectsIntent = PendingIntent.getActivity(context, 0,
                 new Intent(context, ProjectsFragment.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
@@ -68,8 +74,8 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
     // task is due in less than 24 hours
     private boolean taskIsDueSoon(Calendar calendar) {
-        float now = (float) Calendar.getInstance().getTimeInMillis() / 3600000;
-        float due = (float) calendar.getTimeInMillis() / 3600000;
+        float now = (float) Calendar.getInstance().getTimeInMillis() / MILLIS_IN_HOUR;
+        float due = (float) calendar.getTimeInMillis() / MILLIS_IN_HOUR;
         return due - now > 0 && due - now < 24;
     }
 
