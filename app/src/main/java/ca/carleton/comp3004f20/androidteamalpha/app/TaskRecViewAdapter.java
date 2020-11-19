@@ -33,7 +33,12 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
     protected void onBindViewHolder(@NonNull ViewHolder viewHolder, int i, @NonNull Task task) {
         viewHolder.taskComplete.setChecked(task.isComplete());
         viewHolder.txtTaskName.setText(task.getName());
-        viewHolder.txtDueDate.setText("Due: " + task.getDueDate());
+
+        String dueString = "Due: " + Utilities.formatReadableDate(task.getDueDate());
+        if (!task.getDueTime().isEmpty()) {
+            dueString += " at " + task.getDueTime();
+        }
+        viewHolder.txtDueDate.setText(dueString);
 
         int timeDiff = task.getTimeSpent() - task.getTimeRequired();
         if (timeDiff < 0) {
@@ -70,4 +75,5 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
             return view;
         }
     }
+
 }

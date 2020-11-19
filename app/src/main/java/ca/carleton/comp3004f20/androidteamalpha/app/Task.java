@@ -88,7 +88,7 @@ public class Task implements Serializable {
 
     @Exclude
     public Date getDueDateAsSimpleDate() throws ParseException {
-        return new SimpleDateFormat("MMM dd yyyy", Locale.CANADA).parse(dueDate);
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).parse(dueDate);
     }
 
     public void setDueDate(String dueDate) {
