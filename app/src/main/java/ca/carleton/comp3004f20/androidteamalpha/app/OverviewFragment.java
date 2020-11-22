@@ -87,7 +87,7 @@ public class OverviewFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        mViewModel = ViewModelProviders.of(this).get(OverviewViewModel.class);
+        //mViewModel = ViewModelProviders.of(this).get(OverviewViewModel.class);
         // TODO: Use the ViewModel
     }
 
