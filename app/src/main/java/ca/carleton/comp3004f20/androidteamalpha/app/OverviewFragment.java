@@ -16,8 +16,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -45,7 +47,7 @@ public class OverviewFragment extends Fragment {
                     .commit();
             Toast.makeText(getActivity(), "Please sign in...", Toast.LENGTH_SHORT).show();
         } else {
-            Button addTask = (Button) view.findViewById(R.id.btnAddTask);
+            FloatingActionButton addTask = view.findViewById(R.id.btnAddTask);
             addTask.setOnClickListener(v -> getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
@@ -57,6 +59,7 @@ public class OverviewFragment extends Fragment {
                     .getReference()
                     .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
                     .child("tasks")
+                    .orderByChild("dueDate")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
                         @RequiresApi(api = Build.VERSION_CODES.O)
                         @Override
@@ -91,7 +94,7 @@ public class OverviewFragment extends Fragment {
     private void getNum(DataSnapshot dataSnapshot) {
         numOfTasks = (int) dataSnapshot.getChildrenCount();
 
-        HorizontalScrollView scrollView = (HorizontalScrollView) getView().findViewById(R.id.horizontalScrollView);
+        HorizontalScrollView scrollView = getView().findViewById(R.id.horizontalScrollView);
 
         LinearLayout mainLayout = new LinearLayout(getActivity());
         mainLayout.setOrientation(LinearLayout.VERTICAL);
@@ -115,11 +118,9 @@ public class OverviewFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.container, TaskFragment.newInstance(taskObject))
                     .commit());
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(500,500);
-            params.leftMargin = 40;
-            params.topMargin = 40;
-            params.rightMargin = 40;
-            params.bottomMargin = 40;
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(450,450);
+            params.leftMargin = 60;
+            params.topMargin = 60;
 
             newButton.setLayoutParams(params);
             newButton.setText(task.child("name").getValue().toString());
@@ -136,6 +137,10 @@ public class OverviewFragment extends Fragment {
         mainLayout.addView(bottomLayout);
 
         scrollView.addView(mainLayout);
+    }
+
+    private class OverviewViewModel extends ViewModel {
+        // TODO: Implement the ViewModel
     }
 
 }

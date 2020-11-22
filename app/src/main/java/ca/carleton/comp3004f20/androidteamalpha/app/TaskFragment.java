@@ -27,7 +27,6 @@ import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -135,12 +134,17 @@ public class TaskFragment extends Fragment {
     }
 
     private void saveTask() {
-        task.setName(nameEdit.getText().toString());
-        if (task.getName().isEmpty()) {
+        if (nameEdit.getText().toString().isEmpty()) {
             nameEdit.setError("Name is required");
             return;
         }
+        task.setName(nameEdit.getText().toString());
         task.setProjectId(projectSpinner.getSelectedItem().toString());
+
+        if (dueDateEdit.getText().toString().isEmpty()) {
+            dueDateEdit.setError("Date is required");
+            return;
+        }
         task.setDueDate(dueDateEdit.getText().toString());
         task.setDueTime(dueTimeEdit.getText().toString());
 
@@ -177,7 +181,7 @@ public class TaskFragment extends Fragment {
                 .setMessage("Are you sure you want to delete " + task.getName() + "?")
                 .setIcon(android.R.drawable.ic_dialog_alert)
                 .setPositiveButton(android.R.string.yes, (dialog, whichButton) -> {
-                    taskDatabase.child(task.getId()).removeValue();     //TODO can add a completionListener if needed
+                    taskDatabase.child(task.getId()).removeValue();
                     Toast.makeText(getContext(), task.getName() + " deleted", Toast.LENGTH_SHORT).show();
                     launchProjectsFragment();
                 })
@@ -214,17 +218,16 @@ public class TaskFragment extends Fragment {
                 month = c.get(Calendar.MONTH);
                 day = c.get(Calendar.DAY_OF_MONTH);
             } else {
-                year = Integer.parseInt(text.substring(7));
-                month = Arrays.asList(shortMonths).indexOf(text.substring(0, 3));
-                String dayAsString = text.substring(4, 6);
-                day = Integer.parseInt(text.substring(4, 6));
+                year = Integer.parseInt(text.substring(0, 4));
+                month = Integer.parseInt(text.substring(5, 7)) - 1;
+                day = Integer.parseInt(text.substring(8, 10));
             }
             return new DatePickerDialog(getActivity(), this, year, month, day);
         }
 
         public void onDateSet(DatePicker view, int year, int month, int day) {
             mEditText.setText(
-                    String.format(Locale.CANADA, "%s %02d %d", shortMonths[month], day, year)
+                    String.format(Locale.CANADA, "%d-%02d-%02d", year, month + 1, day)
             );
         }
     }

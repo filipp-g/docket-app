@@ -10,7 +10,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.Toast;
+import android.view.View;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -21,16 +21,23 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class MainActivity extends AppCompatActivity {
+
+    private BottomNavigationView bottomNavigationView;
+
     @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        BottomNavigationView bottomNavigationView = findViewById(R.id.bottom_navigation);
+        bottomNavigationView = findViewById(R.id.bottom_navigation);
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
-        getSupportFragmentManager().beginTransaction().replace(R.id.container, getProfileFragment()).commit();
+
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, getInitialFragment())
+                .commit();
 
         createNotificationChannel();
 
@@ -63,7 +70,6 @@ public class MainActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
             }
             getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
-            Toast.makeText(this, "Signing Out", Toast.LENGTH_SHORT).show();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -83,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new TimerFragment();
                 break;
             default:
-                fragment = getProfileFragment();
+                fragment = new ProfileFragment();
                 break;
         }
 
@@ -91,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
         return true;
     };
 
-    private Fragment getProfileFragment() {
+    private Fragment getInitialFragment() {
         if (FirebaseAuth.getInstance().getCurrentUser() == null) {
             return new SignInFragment();
         }
@@ -112,6 +118,14 @@ public class MainActivity extends AppCompatActivity {
             NotificationManager notificationManager = getSystemService(NotificationManager.class);
             notificationManager.createNotificationChannel(channel);
         }
+    }
+
+    protected void showBottomNav() {
+        bottomNavigationView.setVisibility(View.VISIBLE);
+    }
+
+    protected void hideBottomNav() {
+        bottomNavigationView.setVisibility(View.GONE);
     }
 
 }

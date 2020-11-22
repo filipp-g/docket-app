@@ -1,74 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".CalendarFragment">
+    tools:context="CalendarFragment">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/fragment_sign_in_layout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <com.github.sundeepk.compactcalendarview.CompactCalendarView
+        android:id="@+id/compactcalendar_view"
+        android:layout_width="366dp"
+        android:layout_height="296dp"
+        android:layout_marginTop="70dp"
+        app:compactCalendarBackgroundColor="#ffe95451"
+        app:compactCalendarCurrentDayBackgroundColor="#B71C1C"
+        app:compactCalendarCurrentSelectedDayBackgroundColor="#E57373"
+        app:compactCalendarMultiEventIndicatorColor="#fff"
+        app:compactCalendarTargetHeight="250dp"
+        app:compactCalendarTextColor="#fff"
+        app:compactCalendarTextSize="12sp" />
 
-        <com.github.sundeepk.compactcalendarview.CompactCalendarView
-            android:id="@+id/compactcalendar_view"
-            android:layout_width="366dp"
-            android:layout_height="296dp"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            app:compactCalendarBackgroundColor="#ffe95451"
-            app:compactCalendarCurrentDayBackgroundColor="#B71C1C"
-            app:compactCalendarCurrentSelectedDayBackgroundColor="#E57373"
-            app:compactCalendarMultiEventIndicatorColor="#fff"
-            app:compactCalendarTargetHeight="250dp"
-            app:compactCalendarTextColor="#fff"
-            app:compactCalendarTextSize="12sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textView4"
-            app:layout_constraintVertical_bias="0.120000005" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnAddTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_add"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true" />
 
-        <Button
-            android:id="@+id/btnAddTask"
-            android:layout_width="55dp"
-            android:layout_height="41dp"
-            android:layout_marginTop="19dp"
-            android:layout_marginEnd="24dp"
-            android:background="@drawable/btn_circle"
-            android:text="+"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/compactcalendar_view"
-            app:layout_constraintVertical_bias="0.0" />
+    <TextView
+        android:id="@+id/textView4"
+        android:layout_width="125dp"
+        android:layout_height="44dp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="16dp"
+        android:text="Calendar"
+        android:textAlignment="center"
+        android:textSize="75px" />
 
-        <TextView
-            android:id="@+id/textView4"
-            android:layout_width="125dp"
-            android:layout_height="44dp"
-            android:layout_marginTop="24dp"
-            android:gravity="center"
-            android:text="Calendar"
-            android:textSize="75px"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/overviewButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_overview"
+        android:layout_alignParentBottom="true" />
 
-        <ImageButton
-            android:id="@+id/overviewButton"
-            android:layout_width="60dp"
-            android:layout_height="46dp"
-            android:layout_marginStart="24dp"
-            android:scrollbarTrackHorizontal="@drawable/ic_overview"
-            android:scrollbarTrackVertical="@drawable/ic_overview"
-            android:src="@drawable/ic_overview"
-            app:layout_constraintBottom_toBottomOf="@+id/btnAddTask"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/btnAddTask"
-            tools:src="@drawable/ic_overview" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-</FrameLayout>
+</RelativeLayout>

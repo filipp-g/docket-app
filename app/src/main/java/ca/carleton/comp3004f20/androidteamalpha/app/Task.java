@@ -49,8 +49,7 @@ public class Task implements Serializable {
         this.id = "";
         this.name = "";
         this.projectId = "";
-        SimpleDateFormat dateFormat = new SimpleDateFormat("MMM dd yyyy");
-        this.dueDate = dateFormat.format(date);
+        this.dueDate = (new SimpleDateFormat("MMM dd yyyy", Locale.CANADA)).format(date);
         this.dueTime = "";
         this.weight = 0;
         this.timeRequired = 0;
@@ -88,7 +87,7 @@ public class Task implements Serializable {
 
     @Exclude
     public Date getDueDateAsSimpleDate() throws ParseException {
-        return new SimpleDateFormat("MMM dd yyyy", Locale.CANADA).parse(dueDate);
+        return new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA).parse(dueDate);
     }
 
     public void setDueDate(String dueDate) {
@@ -97,11 +96,6 @@ public class Task implements Serializable {
 
     public String getDueTime() {
         return dueTime;
-    }
-
-    @Exclude
-    public Date getDueTimeAsSimpleDate() throws ParseException {
-        return new SimpleDateFormat("hh:mm aa", Locale.CANADA).parse(dueTime);
     }
 
     public void setDueTime(String dueTime) {
@@ -140,18 +134,4 @@ public class Task implements Serializable {
         this.complete = complete;
     }
 
-    @Override
-    public String toString() {
-        return "Task{" +
-                "id='" + id + '\'' +
-                ", name='" + name + '\'' +
-                ", projectId='" + projectId + '\'' +
-                ", dueDate='" + dueDate + '\'' +
-                ", dueTime='" + dueTime + '\'' +
-                ", weight=" + weight +
-                ", timeRequired=" + timeRequired +
-                ", timeSpent=" + timeSpent +
-                ", complete=" + complete +
-                '}';
-    }
 }

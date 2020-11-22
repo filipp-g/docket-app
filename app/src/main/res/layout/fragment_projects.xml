@@ -3,36 +3,29 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ProjectsFragment">
+    tools:context="ProjectsFragment">
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/projectsRecView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/btnAddTask"
         android:layout_marginTop="10dp" />
 
-    <Button
-    android:id="@+id/btnAddTask"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_alignParentBottom="true"
-    android:layout_marginBottom="0dp"
-    android:layout_marginLeft="50dp"
-    android:minWidth="120dp"
-    android:text="add task" />
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/btnAddTask"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_add"
+        android:layout_margin="16dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true" />
 
-    <Button
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/btnDeleteTask"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignBaseline="@+id/btnAddTask"
-        android:layout_alignBottom="@+id/btnAddTask"
-        android:layout_alignParentBottom="true"
-        android:layout_marginBottom="0dp"
-        android:layout_marginLeft="70dp"
-        android:minWidth="120dp"
-        android:layout_toRightOf="@+id/btnAddTask"
-        android:text="delete task" />
+        android:layout_margin="16dp"
+        android:src="@drawable/ic_delete"
+        android:layout_alignParentBottom="true" />
 
 </RelativeLayout>
