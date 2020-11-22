@@ -1,8 +1,5 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.graphics.Color;
-
-import java.util.Calendar;
 import java.util.Date;
 
 public class CalenderEvent {
@@ -16,6 +13,7 @@ public class CalenderEvent {
     public void setColor(int color) {
         this.color = color;
     }
+
     public void setStartEvent(Date date) {
         start = date;
     }

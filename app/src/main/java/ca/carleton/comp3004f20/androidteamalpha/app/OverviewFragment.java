@@ -16,6 +16,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.ViewModel;
 import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -93,7 +94,7 @@ public class OverviewFragment extends Fragment {
     private void getNum(DataSnapshot dataSnapshot) {
         numOfTasks = (int) dataSnapshot.getChildrenCount();
 
-        HorizontalScrollView scrollView = (HorizontalScrollView) getView().findViewById(R.id.horizontalScrollView);
+        HorizontalScrollView scrollView = getView().findViewById(R.id.horizontalScrollView);
 
         LinearLayout mainLayout = new LinearLayout(getActivity());
         mainLayout.setOrientation(LinearLayout.VERTICAL);
@@ -136,6 +137,10 @@ public class OverviewFragment extends Fragment {
         mainLayout.addView(bottomLayout);
 
         scrollView.addView(mainLayout);
+    }
+
+    private class OverviewViewModel extends ViewModel {
+        // TODO: Implement the ViewModel
     }
 
 }

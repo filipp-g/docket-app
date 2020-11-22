@@ -2,22 +2,19 @@ package ca.carleton.comp3004f20.androidteamalpha.app;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
-
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.res.ResourcesCompat;
-import androidx.fragment.app.Fragment;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.TextView;
-import android.widget.Toast;
+
+import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.res.ResourcesCompat;
+import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.firebase.auth.FirebaseAuth;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -25,18 +22,7 @@ import java.util.concurrent.ExecutionException;
 
 import static java.lang.Math.ceil;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TimerFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TimerFragment extends Fragment {
-
-    // FIREBASE VARIABLES
-    private static final String EMAIL = "email";
-    private static final String USER = "user";
-    private String email;
-    private String user;
 
     // TIMER VARIABLES
     private FloatingActionButton fab;
@@ -54,7 +40,7 @@ public class TimerFragment extends Fragment {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
 
         View view = getLayoutInflater().inflate(R.layout.dialog_edit_timer, null, false);
-        final EditText timerMinsEditText = (EditText) view.findViewById(R.id.timer_mins_edit_text);
+        final EditText timerMinsEditText = view.findViewById(R.id.timer_mins_edit_text);
         timerMinsEditText.setText(String.valueOf(timerMinutes));
         dialogBuilder.setView(view);
 
@@ -103,14 +89,7 @@ public class TimerFragment extends Fragment {
     public TimerFragment() {
         // Required empty public constructor
     }
-    public static TimerFragment newInstance(String email, String user) {
-        TimerFragment fragment = new TimerFragment();
-        Bundle args = new Bundle();
-        args.putString(EMAIL, email);
-        args.putString(USER, user);
-        fragment.setArguments(args);
-        return fragment;
-    }
+
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
@@ -139,23 +118,6 @@ public class TimerFragment extends Fragment {
         timerEditText.setFocusableInTouchMode(false);
         timerEditText.setOnClickListener(v -> showTimerEditDialog());
         timerCounterText.setOnClickListener(v -> showTimerEditDialog());
-
-        if (getArguments() != null) {
-            email = getArguments().getString(EMAIL);
-            user = getArguments().getString(USER);
-        }
-
-        // Setup Firebase
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
-            getActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, new SignInFragment())
-                    .commit();
-            Toast.makeText(getActivity(), "Please sign in...", Toast.LENGTH_SHORT).show();
-        } else {
-            // TODO
-        }
 
         return view;
     }
