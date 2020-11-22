@@ -43,7 +43,7 @@ public class TimerFragment extends Fragment {
     private TextView timerCounterText;
     private EditText timerEditText;
     private int timerMinutes = 30;
-    private boolean timerStopped = false;
+    private boolean timerStopped = true;
     private FrameLayout mainView;
 
     // ASYNC VARIABLES
@@ -74,6 +74,14 @@ public class TimerFragment extends Fragment {
     private void stopTimer() {
         if (timerTask != null) {
             if (timerTask.isRunning()) timerTask.setRunning(false);
+            try {
+                // Wait for task to finish
+                timerTask.get();
+            } catch (ExecutionException e) {
+                // Do nothing
+            } catch (InterruptedException e) {
+                // Do nothing
+            }
         }
 
         fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, getActivity().getTheme()));
@@ -125,7 +133,7 @@ public class TimerFragment extends Fragment {
 
         fab.setOnClickListener(v -> {
             if (timerStopped) startTimer();
-            else stopTimer();
+            else resetTimer();
         });
 
         timerEditText.setFocusableInTouchMode(false);
