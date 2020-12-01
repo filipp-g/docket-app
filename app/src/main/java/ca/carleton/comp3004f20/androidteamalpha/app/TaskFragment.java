@@ -22,8 +22,11 @@ import androidx.fragment.app.Fragment;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.text.DateFormatSymbols;
 import java.util.ArrayList;
@@ -35,6 +38,7 @@ public class TaskFragment extends Fragment {
     private static final String TASK = "taskObj";
     private Task task;
 
+    private DatabaseReference projectDatabase;
     private DatabaseReference taskDatabase;
 
     private Spinner projectSpinner;
@@ -66,6 +70,12 @@ public class TaskFragment extends Fragment {
         if (getArguments() != null) {
             task = (Task) getArguments().getSerializable(TASK);
         }
+
+        projectDatabase = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child("projects");
+        initElements(view);
 
         taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
@@ -109,17 +119,30 @@ public class TaskFragment extends Fragment {
 
 
     private void populateProjects(View view) {
-        List<String> projectList = new ArrayList<>();
-        projectList.add("super unnecessary long name project");
-        projectList.add("comp3203");        //TODO put real projects
+        projectDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                List<String> projectList = new ArrayList<>();
+                for (DataSnapshot dataSnap : snapshot.getChildren()){
+                    Project project = dataSnap.getValue(Project.class);
+                    projectList.add(project.getName());
+                }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                getActivity(), R.layout.projects_spinner_item, projectList
-        );
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                        getActivity(), R.layout.projects_spinner_item, projectList
+                );
 
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        projectSpinner = view.findViewById(R.id.spinnerProjects);
-        projectSpinner.setAdapter(adapter);
+                adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                projectSpinner = view.findViewById(R.id.spinnerProjects);
+                projectSpinner.setAdapter(adapter);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+        });
+
     }
 
     private void populateTask(Task task) {
