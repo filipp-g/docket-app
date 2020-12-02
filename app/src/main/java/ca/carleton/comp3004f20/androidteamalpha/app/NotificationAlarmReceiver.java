@@ -32,7 +32,7 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
 
         FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("tasks")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override

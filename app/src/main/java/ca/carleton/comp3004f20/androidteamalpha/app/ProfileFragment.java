@@ -75,7 +75,7 @@ public class ProfileFragment extends Fragment {
 
         FirebaseDatabase.getInstance()
                 .getReference()
-                .child(user.getDisplayName())
+                .child(user.getUid())
                 .child("settings")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
@@ -104,7 +104,7 @@ public class ProfileFragment extends Fragment {
 
                             DatabaseReference settingsRef = FirebaseDatabase.getInstance()
                                     .getReference()
-                                    .child(user.getDisplayName())
+                                    .child(user.getUid())
                                     .child("settings");
                             settingsRef.child("notify_enabled").setValue(notifySwitch.isChecked());
                             settingsRef.child("notify_alarm_time").setValue(alertTimeEdit.getText().toString());

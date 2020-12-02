@@ -73,13 +73,13 @@ public class TaskFragment extends Fragment {
 
         projectDatabase = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("projects");
         initElements(view);
 
         taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("tasks");
         initElements(view);
 
@@ -223,11 +223,9 @@ public class TaskFragment extends Fragment {
 
     public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
         private EditText mEditText;
-        private String[] shortMonths;
 
         public DatePickerFragment(EditText mEditText) {
             this.mEditText = mEditText;
-            this.shortMonths = new DateFormatSymbols().getShortMonths();
         }
 
         @NonNull

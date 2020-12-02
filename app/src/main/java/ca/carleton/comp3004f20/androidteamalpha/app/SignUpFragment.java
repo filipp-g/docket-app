@@ -76,7 +76,7 @@ public class SignUpFragment extends Fragment {
                                 .addOnCompleteListener(updateTask -> {
                                     DatabaseReference settingsRef = FirebaseDatabase.getInstance()
                                             .getReference()
-                                            .child(user.getDisplayName())
+                                            .child(user.getUid())
                                             .child("settings");
                                     settingsRef.child("notify_enabled").setValue(false);
                                     settingsRef.child("notify_alarm_time").setValue("09:00");

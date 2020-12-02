@@ -23,11 +23,6 @@ import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link TasksFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TasksFragment extends Fragment {
     private static final String PROJECT = "projectObj";
     private Project project;
@@ -54,7 +49,7 @@ public class TasksFragment extends Fragment {
 
         DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         Query query = taskDatabase.child("tasks").orderByChild("projectId").equalTo(project.getName());
 
         FirebaseRecyclerOptions<Task> options = new FirebaseRecyclerOptions.Builder<Task>()

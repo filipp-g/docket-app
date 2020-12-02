@@ -42,7 +42,7 @@ public class ProjectRecViewAdapter extends FirebaseRecyclerAdapter<Project, Proj
 
         DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         Query query = taskDatabase.child("tasks").orderByChild("projectId").equalTo(project.getName());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

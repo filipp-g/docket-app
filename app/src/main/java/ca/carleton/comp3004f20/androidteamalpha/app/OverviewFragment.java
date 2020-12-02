@@ -57,7 +57,7 @@ public class OverviewFragment extends Fragment {
 
             FirebaseDatabase.getInstance()
                     .getReference()
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .child("tasks")
                     .orderByChild("dueDate")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
