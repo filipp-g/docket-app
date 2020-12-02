@@ -20,6 +20,8 @@ import androidx.fragment.app.Fragment;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.firebase.auth.FirebaseAuth;
 
+import java.util.Calendar;
+
 public class MainActivity extends AppCompatActivity {
 
     private BottomNavigationView bottomNavigationView;
@@ -34,11 +36,6 @@ public class MainActivity extends AppCompatActivity {
         bottomNavigationView.setOnNavigationItemSelectedListener(bottomNavMethod);
         bottomNavigationView.setSelectedItemId(R.id.nav_profile);
 
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.container, getInitialFragment())
-                .commit();
-
         createNotificationChannel();
 
         PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0,
@@ -48,13 +45,12 @@ public class MainActivity extends AppCompatActivity {
         // this triggers the alarm on app launch
         alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, alarmIntent);
 
-        //TODO scheduling notifications works but with ~5min delay, so not great for demos
-//        Calendar calendar = Calendar.getInstance();
-//        calendar.setTimeInMillis(System.currentTimeMillis());
-//        calendar.set(Calendar.HOUR_OF_DAY, 19);
-//        calendar.set(Calendar.MINUTE, 41);
-//        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-//                AlarmManager.INTERVAL_DAY, alarmIntent);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 19);
+        calendar.set(Calendar.MINUTE, 41);
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent);
     }
 
     @Override
@@ -69,7 +65,10 @@ public class MainActivity extends AppCompatActivity {
             if (FirebaseAuth.getInstance().getCurrentUser() != null) {
                 FirebaseAuth.getInstance().signOut();
             }
-            getSupportFragmentManager().beginTransaction().replace(R.id.container, new SignInFragment()).commit();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.container, new SignInFragment())
+                    .commit();
             return true;
         }
         return super.onOptionsItemSelected(item);
@@ -89,7 +88,7 @@ public class MainActivity extends AppCompatActivity {
                 fragment = new TimerFragment();
                 break;
             default:
-                fragment = new ProfileFragment();
+                fragment = getInitialFragment();
                 break;
         }
 

@@ -1,6 +1,5 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -42,7 +41,7 @@ public class ProjectRecViewAdapter extends FirebaseRecyclerAdapter<Project, Proj
 
         DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
         Query query = taskDatabase.child("tasks").orderByChild("projectId").equalTo(project.getName());
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

@@ -17,7 +17,6 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProviders;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -57,7 +56,7 @@ public class OverviewFragment extends Fragment {
 
             FirebaseDatabase.getInstance()
                     .getReference()
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                     .child("tasks")
                     .orderByChild("dueDate")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
