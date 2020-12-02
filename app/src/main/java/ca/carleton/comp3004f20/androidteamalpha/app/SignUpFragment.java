@@ -13,6 +13,8 @@ import androidx.fragment.app.Fragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 public class SignUpFragment extends Fragment {
     private FirebaseAuth mAuth;
@@ -63,22 +65,33 @@ public class SignUpFragment extends Fragment {
 
     private void sign_up(FirebaseAuth mAuth, String email, String password, String name) {
         mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(getActivity(), task -> {
-                    if (task.isSuccessful()) {
+                .addOnCompleteListener(getActivity(), createTask -> {
+                    if (createTask.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
                         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                                 .setDisplayName(name)
                                 .build();
-                        user.updateProfile(profileUpdates);
 
-                        getActivity()
-                                .getSupportFragmentManager()
-                                .beginTransaction()
-                                .replace(R.id.container, new ProfileFragment())
-                                .commit();
-                        ((MainActivity)getActivity()).showBottomNav();
+                        user.updateProfile(profileUpdates)
+                                .addOnCompleteListener(updateTask -> {
+                                    DatabaseReference settingsRef = FirebaseDatabase.getInstance()
+                                            .getReference()
+                                            .child(user.getDisplayName())
+                                            .child("settings");
+                                    settingsRef.child("notify_enabled").setValue(false);
+                                    settingsRef.child("notify_alarm_time").setValue("09:00");
+                                    settingsRef.child("notify_due_period").setValue(24);
+
+                                    getActivity()
+                                            .getSupportFragmentManager()
+                                            .beginTransaction()
+                                            .replace(R.id.container, new ProfileFragment())
+                                            .commit();
+                                    ((MainActivity) getActivity()).showBottomNav();
+                                });
                     } else {
                         Toast.makeText(getActivity(), "Failed to create new user", Toast.LENGTH_SHORT).show();
+                        System.out.println(createTask.getException());
                     }
                 });
     }
