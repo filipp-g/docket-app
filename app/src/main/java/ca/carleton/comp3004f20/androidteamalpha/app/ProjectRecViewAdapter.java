@@ -1,6 +1,5 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

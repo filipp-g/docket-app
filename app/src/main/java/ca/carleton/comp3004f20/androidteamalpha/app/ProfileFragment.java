@@ -54,6 +54,9 @@ public class ProfileFragment extends Fragment {
         notifyPeriodEdit = view.findViewById(R.id.editDuePeriod);
 
         alertTimeEdit = view.findViewById(R.id.editAlarmTime);
+        alertTimeEdit.setOnClickListener(v ->
+                Utilities.showTimePickerDialog(getActivity(), alertTimeEdit)
+        );
 
         notifySwitch = view.findViewById(R.id.switchEnable);
         notifySwitch.setOnCheckedChangeListener((v, isChecked) -> {
@@ -86,8 +89,7 @@ public class ProfileFragment extends Fragment {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) {
-                    }
+                    public void onCancelled(@NonNull DatabaseError error) { }
                 });
     }
 

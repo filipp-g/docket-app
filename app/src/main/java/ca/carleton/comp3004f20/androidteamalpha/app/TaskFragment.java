@@ -1,23 +1,17 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
-import android.app.Dialog;
-import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
-import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -28,11 +22,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.DateFormatSymbols;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 
 public class TaskFragment extends Fragment {
     private static final String TASK = "taskObj";
@@ -44,7 +35,6 @@ public class TaskFragment extends Fragment {
     private Spinner projectSpinner;
     private EditText nameEdit, dueDateEdit, dueTimeEdit, weightEdit, timeReqEdit, timeSpentEdit;
     private SwitchMaterial completeSwitch;
-    private Button saveButton, deleteButton;
 
     public TaskFragment() {
         // Required empty public constructor
@@ -97,26 +87,29 @@ public class TaskFragment extends Fragment {
         populateProjects(view);
 
         dueDateEdit = view.findViewById(R.id.editTextDate);
-        dueDateEdit.setOnClickListener(f -> showDatePickerDialog());
+        dueDateEdit.setOnClickListener(v ->
+                Utilities.showDatePickerDialog(getActivity(), dueDateEdit)
+        );
         dueTimeEdit = view.findViewById(R.id.editTextTime);
-        dueTimeEdit.setOnClickListener(f -> showTimePickerDialog());
+        dueTimeEdit.setOnClickListener(v ->
+                Utilities.showTimePickerDialog(getActivity(), dueTimeEdit)
+        );
 
         weightEdit = view.findViewById(R.id.editTextWeight);
         timeReqEdit = view.findViewById(R.id.editTextTimeReq);
         timeSpentEdit = view.findViewById(R.id.editTextTimeSpent);
         completeSwitch = view.findViewById(R.id.switchComplete);
 
-        saveButton = view.findViewById(R.id.btnSave);
+        Button saveButton = view.findViewById(R.id.btnSave);
         saveButton.setOnClickListener(f -> saveTask());
 
-        deleteButton = view.findViewById(R.id.btnDelete);
+        Button deleteButton = view.findViewById(R.id.btnDelete);
         if (task == null) {
             deleteButton.setVisibility(View.INVISIBLE);
         } else {
             deleteButton.setOnClickListener(f -> deleteTask());
         }
     }
-
 
     private void populateProjects(View view) {
         projectDatabase.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -139,7 +132,6 @@ public class TaskFragment extends Fragment {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-
             }
         });
 
@@ -147,7 +139,6 @@ public class TaskFragment extends Fragment {
 
     private void populateTask(Task task) {
         nameEdit.setText(task.getName());
-//        projectSpinner            //TODO set project name
         dueDateEdit.setText(task.getDueDate());
         dueTimeEdit.setText(task.getDueTime());
         weightEdit.setText("" + task.getWeight());
@@ -209,76 +200,6 @@ public class TaskFragment extends Fragment {
                     launchProjectsFragment();
                 })
                 .setNegativeButton(android.R.string.no, null).show();
-    }
-
-    private void showDatePickerDialog() {
-        DialogFragment newFragment = new TaskFragment.DatePickerFragment(dueDateEdit);
-        newFragment.show(getActivity().getSupportFragmentManager(), "datePicker");
-    }
-
-    private void showTimePickerDialog() {
-        DialogFragment newFragment = new TaskFragment.TimePickerFragment(dueTimeEdit);
-        newFragment.show(getActivity().getSupportFragmentManager(), "timePicker");
-    }
-
-    public static class DatePickerFragment extends DialogFragment implements DatePickerDialog.OnDateSetListener {
-        private EditText mEditText;
-
-        public DatePickerFragment(EditText mEditText) {
-            this.mEditText = mEditText;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            int year, month, day;
-            String text = mEditText.getText().toString();
-            if (text.isEmpty()) {
-                final Calendar c = Calendar.getInstance();
-                year = c.get(Calendar.YEAR);
-                month = c.get(Calendar.MONTH);
-                day = c.get(Calendar.DAY_OF_MONTH);
-            } else {
-                year = Integer.parseInt(text.substring(0, 4));
-                month = Integer.parseInt(text.substring(5, 7)) - 1;
-                day = Integer.parseInt(text.substring(8, 10));
-            }
-            return new DatePickerDialog(getActivity(), this, year, month, day);
-        }
-
-        public void onDateSet(DatePicker view, int year, int month, int day) {
-            mEditText.setText(
-                    String.format(Locale.CANADA, "%d-%02d-%02d", year, month + 1, day)
-            );
-        }
-    }
-
-    public static class TimePickerFragment extends DialogFragment implements TimePickerDialog.OnTimeSetListener {
-        private EditText mEditText;
-
-        public TimePickerFragment(EditText mEditText) {
-            this.mEditText = mEditText;
-        }
-
-        @NonNull
-        @Override
-        public Dialog onCreateDialog(Bundle savedInstanceState) {
-            int hour, minute;
-            String text = mEditText.getText().toString();
-            if (text.isEmpty()) {
-                final Calendar c = Calendar.getInstance();
-                hour = c.get(Calendar.HOUR_OF_DAY);
-                minute = c.get(Calendar.MINUTE);
-            } else {
-                hour = Integer.parseInt(text.substring(0, text.indexOf(":")));
-                minute = Integer.parseInt(text.substring(text.indexOf(":") + 1, text.indexOf(":") + 3));
-            }
-            return new TimePickerDialog(getActivity(), this, hour, minute, false);
-        }
-
-        public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-            mEditText.setText(String.format(Locale.CANADA, "%02d:%02d", hourOfDay, minute));
-        }
     }
 
     private void launchProjectsFragment() {
