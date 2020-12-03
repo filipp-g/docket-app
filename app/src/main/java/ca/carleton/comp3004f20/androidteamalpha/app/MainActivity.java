@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
@@ -23,6 +24,9 @@ import com.google.firebase.auth.FirebaseAuth;
 import java.util.Calendar;
 
 public class MainActivity extends AppCompatActivity {
+
+    private PendingIntent alarmIntent;
+    private AlarmManager alarmMgr;
 
     private BottomNavigationView bottomNavigationView;
 
@@ -38,19 +42,11 @@ public class MainActivity extends AppCompatActivity {
 
         createNotificationChannel();
 
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, 0,
-                new Intent(this, NotificationAlarmReceiver.class), 0);
+        alarmIntent = PendingIntent.getBroadcast(this, 0,
+                new Intent(this, NotificationAlarmReceiver.class),
+                PendingIntent.FLAG_UPDATE_CURRENT);
 
-        AlarmManager alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
-        // this triggers the alarm on app launch
-        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, 0, alarmIntent);
-
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 19);
-        calendar.set(Calendar.MINUTE, 41);
-        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                AlarmManager.INTERVAL_DAY, alarmIntent);
+        alarmMgr = (AlarmManager) this.getSystemService(Context.ALARM_SERVICE);
     }
 
     @Override
@@ -125,6 +121,22 @@ public class MainActivity extends AppCompatActivity {
 
     protected void hideBottomNav() {
         bottomNavigationView.setVisibility(View.GONE);
+    }
+
+    protected void setNotificationAlarm(int hour, int minute) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, hour);
+        calendar.set(Calendar.MINUTE, minute);
+        alarmMgr.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                AlarmManager.INTERVAL_DAY, alarmIntent);
+        String notifyStr = String.format("Notifications set for %02d:%02d", hour, minute);
+        Toast.makeText(this, notifyStr, Toast.LENGTH_SHORT).show();
+    }
+
+    protected void cancelNotificationAlarms() {
+        alarmMgr.cancel(alarmIntent);
+        Toast.makeText(this, "Notifications disabled", Toast.LENGTH_SHORT).show();
     }
 
 }

@@ -89,7 +89,8 @@ public class ProfileFragment extends Fragment {
                     }
 
                     @Override
-                    public void onCancelled(@NonNull DatabaseError error) { }
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
                 });
     }
 
@@ -112,6 +113,14 @@ public class ProfileFragment extends Fragment {
                             settingsRef.child("notify_alarm_time").setValue(alertTimeEdit.getText().toString());
                             settingsRef.child("notify_due_period").setValue(Integer.parseInt(notifyPeriodEdit.getText().toString()));
 
+                            if (notifySwitch.isChecked()) {
+                                String time = alertTimeEdit.getText().toString();
+                                int hour = Integer.parseInt(time.substring(0, time.indexOf(":")));
+                                int minute = Integer.parseInt(time.substring(time.indexOf(":") + 1));
+                                ((MainActivity) getActivity()).setNotificationAlarm(hour, minute);
+                            } else {
+                                ((MainActivity) getActivity()).cancelNotificationAlarms();
+                            }
                             Toast.makeText(getActivity(), "Profile updated", Toast.LENGTH_SHORT).show();
                         } else {
                             emailEdit.setError(updateEmailTask.getException().getMessage());
