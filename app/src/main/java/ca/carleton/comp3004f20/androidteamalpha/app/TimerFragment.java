@@ -168,9 +168,8 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
 
         FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("tasks")
-                .orderByChild("dueDate")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @RequiresApi(api = Build.VERSION_CODES.O)
                     @Override
