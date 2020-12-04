@@ -31,12 +31,12 @@ import java.util.List;
 import static java.lang.Math.min;
 
 public class TimerFragment extends Fragment implements AdapterView.OnItemClickListener {
+    private static final String TASK = "taskObj";
 
     // TIMER VARIABLES
     private FloatingActionButton start;
     private FloatingActionButton stop;
     private FloatingActionButton pause;
-    private FrameLayout mainView;
     private Chronometer chronometer;
     private Chronometer chronometerSeconds;
     private Spinner taskSpinner;
@@ -75,7 +75,6 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
         stop = view.findViewById(R.id.fab_stop);
         pause = view.findViewById(R.id.fab_pause);
 
-        mainView = view.findViewById(R.id.main);
         chronometer = view.findViewById(R.id.chronometer);
         chronometerSeconds = view.findViewById(R.id.chronometerSeconds);
 
@@ -102,7 +101,7 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
 
         taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("tasks");
 
         start.setOnClickListener(v -> {
@@ -126,10 +125,12 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
         });
 
         stop.setOnClickListener(v -> {
+            chronometerSeconds.stop();
+            chronometer.stop();
             long millis = SystemClock.elapsedRealtime() - chronometer.getBase();
             int h = (int)(millis/minInLong);
             int m = (int)(millis - h*minInLong)/hourInLong;
-            int s= (int)(millis - h*minInLong- m*hourInLong)/1000;
+            int s = (int)(millis - h*minInLong- m*hourInLong)/1000;
 
             chronometer.setBase(SystemClock.elapsedRealtime());
             chronometerSeconds.setBase(SystemClock.elapsedRealtime());
