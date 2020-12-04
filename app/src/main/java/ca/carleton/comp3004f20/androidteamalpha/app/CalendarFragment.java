@@ -7,11 +7,12 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
@@ -35,7 +36,7 @@ import java.util.Locale;
 public class CalendarFragment extends Fragment {
 
     private CompactCalendarView compactCalendar;
-    private SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MMMM- yyyy", Locale.getDefault());
+    private SimpleDateFormat dateFormatMonth = new SimpleDateFormat("MMMM yyyy", Locale.getDefault());
 
     public List<CalenderEvent> calenderListOfEvents = new ArrayList<>();
 
@@ -53,10 +54,9 @@ public class CalendarFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_calendar, container, false);
 
-        final ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
-        assert actionBar != null;
-        actionBar.setDisplayHomeAsUpEnabled(false);
-        actionBar.setTitle(null);
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Calendar");
+
+        ((TextView) view.findViewById(R.id.calendar_title)).setText(dateFormatMonth.format(new Date()));
 
         compactCalendar = view.findViewById(R.id.compactcalendar_view);
 
@@ -109,7 +109,8 @@ public class CalendarFragment extends Fragment {
 
             @Override
             public void onMonthScroll(Date firstDayOfNewMonth) {
-                actionBar.setTitle(dateFormatMonth.format(firstDayOfNewMonth));
+                ((TextView) view.findViewById(R.id.calendar_title))
+                        .setText(dateFormatMonth.format(firstDayOfNewMonth));
             }
         });
 

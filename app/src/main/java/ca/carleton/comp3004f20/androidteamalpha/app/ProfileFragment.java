@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.drawable.RoundedBitmapDrawable;
 import androidx.core.graphics.drawable.RoundedBitmapDrawableFactory;
 import androidx.fragment.app.Fragment;
@@ -42,6 +43,8 @@ public class ProfileFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_profile, container, false);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Profile");
 
         RoundedBitmapDrawable mDrawable = RoundedBitmapDrawableFactory.create(
                 getResources(), BitmapFactory.decodeResource(getResources(), R.drawable.homer)

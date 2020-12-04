@@ -12,6 +12,7 @@ import android.widget.Spinner;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.switchmaterial.SwitchMaterial;
@@ -57,28 +58,22 @@ public class TaskFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_task, container, false);
 
-        if (getArguments() != null) {
-            task = (Task) getArguments().getSerializable(TASK);
-        }
-
-        projectDatabase = FirebaseDatabase.getInstance()
+        DatabaseReference userDb = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("projects");
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
+
+        projectDatabase = userDb.child("projects");
+        taskDatabase = userDb.child("tasks");
         initElements(view);
 
-        taskDatabase = FirebaseDatabase.getInstance()
-                .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                .child("tasks");
-        initElements(view);
-
+        task = (Task) getArguments().getSerializable(TASK);
         if (task == null) {
             task = new Task();
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("New Task");
         } else {
             populateTask(task);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(task.getName());
         }
-
         return view;
     }
 
