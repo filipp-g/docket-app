@@ -1,6 +1,5 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -9,21 +8,15 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.Chronometer;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.Spinner;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -31,14 +24,9 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
-import static java.lang.Math.ceil;
 import static java.lang.Math.min;
 
 public class TimerFragment extends Fragment implements AdapterView.OnItemClickListener {
@@ -52,7 +40,8 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
     private Chronometer chronometerSeconds;
     private Spinner taskSpinner;
     private boolean running = false;
-    private long pauseOffset = 0;
+    private long pauseOffsetSeconds = 0;
+    private long pauseOffsetMinites = 0;
     private List<String> listOfTasks = new ArrayList<>();
     private List<String> tasksID = new ArrayList<>();
     private List<Integer> tasksTimeSpent = new ArrayList<>();
@@ -115,21 +104,21 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
 
         start.setOnClickListener(v -> {
             if (!running) {
-                chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffset);
+                chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffsetMinites);
                 chronometer.start();
-                chronometerSeconds.setBase(SystemClock.elapsedRealtime() - pauseOffset);
+                chronometerSeconds.setBase(SystemClock.elapsedRealtime() - pauseOffsetSeconds);
                 chronometerSeconds.start();
                 running = true;
             } else {
-                pause(chronometer);
-                pause(chronometerSeconds);
+                pauseOffsetMinites = pause(chronometer);
+                pauseOffsetSeconds= pause(chronometerSeconds);
             }
         });
 
         pause.setOnClickListener(v -> {
             if (running) {
-                pause(chronometer);
-                pause(chronometerSeconds);
+                pauseOffsetMinites = pause(chronometer);
+                pauseOffsetSeconds = pause(chronometerSeconds);
             }
         });
 
@@ -141,36 +130,35 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
 
             chronometer.setBase(SystemClock.elapsedRealtime());
             chronometerSeconds.setBase(SystemClock.elapsedRealtime());
-            pauseOffset = 0;
+            pauseOffsetSeconds = 0;
+            pauseOffsetMinites = 0;
 
             for (int counter = 0; counter < taskLength; counter++) {
                 String databaseId = listOfTasks.get(counter);
-                String localId = tasksID.get(counter);
-                int localTimeSpent = Integer.parseInt(tasksTimeSpent.get(counter).toString());
-                int localTimeRequired = Integer.parseInt(tasksTimeRequired.get(counter).toString());
-                int totalMinutes = m + tasksMinutes.get(counter);
-
-                if (totalMinutes > 60) {
-                    h += 1;
-                    totalMinutes = totalMinutes - 60;
-                }
-
                 if (taskSpinner.getSelectedItem().toString().contains(databaseId)) {
-                    int totalNumberOfHoursSpends = h + localTimeSpent;
-                    taskDatabase.child(localId).child("timeSpent").setValue(totalNumberOfHoursSpends);
-                    taskDatabase.child(localId).child("timeSpentMinutes").setValue(totalMinutes);
+                    String localId = tasksID.get(counter);
+                    int localTimeSpent = Integer.parseInt(tasksTimeSpent.get(counter).toString());
+                    int localTimeRequired = Integer.parseInt(tasksTimeRequired.get(counter).toString());
+                    localTimeSpent += m;
+
+                    if (h > 0) {
+                        localTimeSpent =+ h*60;
+                    }
+
+
+                    taskDatabase.child(localId).child("timeSpent").setValue(localTimeSpent);
 
                     if (localTimeSpent >= localTimeRequired) {
                         taskDatabase.child(localId).child("complete").setValue(true);
                         Toast.makeText(getContext(),"time spend: " + h + ":" + m + ":" + s +
-                                        "\ntotal hours spend: " + totalNumberOfHoursSpends +
+                                        "\ntotal time spend: " + (h * 60 + m) +
                                         "\n\n\nThe task is now complete",
                                 Toast.LENGTH_LONG).show();
                     } else {
                         int hoursLeft = localTimeRequired - localTimeSpent;
                         Toast.makeText(getContext(),"time spend: " + h + ":" + m + ":" + s +
-                                "\ntotal hours spend: " + totalNumberOfHoursSpends + "\n\n\n" +
-                                hoursLeft + " hours left on the task", Toast.LENGTH_LONG).show();
+                                "\ntotal time spend: " + (h * 60 + m) + "\n\n\n" + hoursLeft +
+                                " minites left on the task", Toast.LENGTH_LONG).show();
                     }
 
                     break;
@@ -197,10 +185,12 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
         return view;
     }
 
-    private void pause(Chronometer chronometer) {
+    private long pause(Chronometer chronometer) {
         chronometer.stop();
-        pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
+        long pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
         running = false;
+
+        return pauseOffset;
     }
 
     private void populateTasks(View view, DataSnapshot dataSnapshot) {
@@ -209,12 +199,12 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
             String id = task.child("id").getValue().toString();
             int timeSpent = Integer.parseInt(task.child("timeSpent").getValue().toString());
             int timeRequired = Integer.parseInt(task.child("timeRequired").getValue().toString());
-            int timeSpentMinutes = Integer.parseInt(task.child("timeSpentMinutes").getValue().toString());
+            int timeSpentHours = timeSpent/60;
             listOfTasks.add(name);
             tasksID.add(id);
             tasksTimeSpent.add(timeSpent);
             tasksTimeRequired.add(timeRequired);
-            tasksMinutes.add(timeSpentMinutes);
+            tasksMinutes.add(timeSpent - timeSpentHours*60);
             taskLength++;
         }
 

@@ -42,7 +42,9 @@ public class TaskRecViewAdapter extends FirebaseRecyclerAdapter<Task, TaskRecVie
 
         int timeDiff = task.getTimeSpent() - task.getTimeRequired();
         if (timeDiff < 0) {
-            viewHolder.txtTimeLeft.setText(timeDiff + "h");
+            int timeH = timeDiff/60;
+            int timeM = timeDiff - timeH*60;
+            viewHolder.txtTimeLeft.setText(timeM + "m");
             viewHolder.txtTimeLeft.setTextColor(Color.RED);
         }
 
