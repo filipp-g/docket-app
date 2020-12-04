@@ -208,12 +208,16 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
             taskLength++;
         }
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(
-                getActivity(), R.layout.projects_spinner_item, listOfTasks);
+        System.out.println(listOfTasks);
 
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        taskSpinner = view.findViewById(R.id.task_Spinner);
-        taskSpinner.setAdapter(adapter);
+        if (getActivity() != null) {
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                    getActivity(), R.layout.projects_spinner_item, listOfTasks);
+
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            taskSpinner = view.findViewById(R.id.task_Spinner);
+            taskSpinner.setAdapter(adapter);
+        }
     }
 
     @Override
