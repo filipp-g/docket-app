@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,6 +31,7 @@ public class SignInFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_sign_in, container, false);
         mAuth = FirebaseAuth.getInstance();
 
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Sign in");
         ((MainActivity)getActivity()).hideBottomNav();
 
         Button signUp = view.findViewById(R.id.signUp);

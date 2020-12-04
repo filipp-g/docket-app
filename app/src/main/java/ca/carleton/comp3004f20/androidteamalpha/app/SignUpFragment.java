@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
@@ -33,6 +34,7 @@ public class SignUpFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_sign_up, container, false);
         mAuth = FirebaseAuth.getInstance();
 
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Sign up");
         ((MainActivity) getActivity()).hideBottomNav();
 
         final EditText emailId = view.findViewById(R.id.editTextTextEmailAddress);

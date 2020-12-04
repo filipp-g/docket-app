@@ -37,7 +37,7 @@ public class ProjectRecViewAdapter extends FirebaseRecyclerAdapter<Project, Proj
     @Override
     protected void onBindViewHolder(@NonNull ProjectRecViewAdapter.ViewHolder viewHolder, int i, @NonNull Project project) {
         viewHolder.projectComplete.setChecked(false);
-        viewHolder.txtProjectName.setText("Project: " + project.getName());
+        viewHolder.txtProjectName.setText(project.getName());
 
         DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
@@ -46,7 +46,8 @@ public class ProjectRecViewAdapter extends FirebaseRecyclerAdapter<Project, Proj
         query.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
-                viewHolder.txtNumberOfTasks.setText(snapshot.getChildrenCount() + " tasks");
+                long numTasks = snapshot.getChildrenCount();
+                viewHolder.txtNumberOfTasks.setText(numTasks + (numTasks == 1 ? " task" : " tasks"));
             }
 
             @Override

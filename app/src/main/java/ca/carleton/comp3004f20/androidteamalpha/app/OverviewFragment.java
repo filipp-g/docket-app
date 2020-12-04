@@ -10,11 +10,11 @@ import android.widget.HorizontalScrollView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModel;
 
@@ -38,46 +38,41 @@ public class OverviewFragment extends Fragment {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.overview_fragment, container, false);
 
-        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Overview");
+
+        FloatingActionButton addTask = view.findViewById(R.id.btnAddTask);
+        addTask.setOnClickListener(v -> getActivity()
+                .getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.container, TaskFragment.newInstance(null))
+                .commit()
+        );
+
+        FirebaseDatabase.getInstance()
+                .getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
+                .child("tasks")
+                .orderByChild("dueDate")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        getNum(dataSnapshot);
+                    }
+
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+
+        ImageButton overViewButton = view.findViewById(R.id.calenderButton);
+        overViewButton.setOnClickListener(v -> {
+            Fragment fragment = new CalendarFragment();
             getActivity()
                     .getSupportFragmentManager()
                     .beginTransaction()
-                    .replace(R.id.container, new SignInFragment())
+                    .replace(R.id.container, fragment)
                     .commit();
-            Toast.makeText(getActivity(), "Please sign in...", Toast.LENGTH_SHORT).show();
-        } else {
-            FloatingActionButton addTask = view.findViewById(R.id.btnAddTask);
-            addTask.setOnClickListener(v -> getActivity()
-                    .getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.container, TaskFragment.newInstance(null))
-                    .commit()
-            );
-
-            FirebaseDatabase.getInstance()
-                    .getReference()
-                    .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
-                    .child("tasks")
-                    .orderByChild("dueDate")
-                    .addListenerForSingleValueEvent(new ValueEventListener() {
-                        @RequiresApi(api = Build.VERSION_CODES.O)
-                        @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            getNum(dataSnapshot);
-                        }
-                        @Override
-                        public void onCancelled(DatabaseError databaseError) {
-                        }
-                    });
-        }
-
-        ImageButton overViewButton = (ImageButton) view.findViewById(R.id.calenderButton);
-        overViewButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Fragment fragment = new CalendarFragment();
-                getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment).commit();
-            }
         });
 
         return view;
@@ -117,7 +112,7 @@ public class OverviewFragment extends Fragment {
                     .beginTransaction()
                     .replace(R.id.container, TaskFragment.newInstance(taskObject))
                     .commit());
-            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(450,450);
+            RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(450, 450);
             params.leftMargin = 60;
             params.topMargin = 60;
 

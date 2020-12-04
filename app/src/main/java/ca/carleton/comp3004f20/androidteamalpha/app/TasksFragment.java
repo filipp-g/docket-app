@@ -9,7 +9,9 @@ import android.widget.CheckBox;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -21,6 +23,8 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
 
 import java.util.ArrayList;
+
+import static android.widget.LinearLayout.VERTICAL;
 
 public class TasksFragment extends Fragment {
     private static final String PROJECT = "projectObj";
@@ -42,9 +46,14 @@ public class TasksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_tasks, container, false);
 
+        String title = "Tasks";
+
         if (getArguments() != null) {
             project = (Project) getArguments().getSerializable(PROJECT);
+            title = project.getName();
         }
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(title);
 
         DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
                 .getReference()
@@ -57,9 +66,11 @@ public class TasksFragment extends Fragment {
                 .build();
 
         TaskRecViewAdapter adapter = new TaskRecViewAdapter(options);
+        DividerItemDecoration divider = new DividerItemDecoration(view.getContext(), VERTICAL);
 
         RecyclerView tasksRecView = view.findViewById(R.id.tasksRecView);
         tasksRecView.setAdapter(adapter);
+        tasksRecView.addItemDecoration(divider);
         tasksRecView.setLayoutManager(new LinearLayoutManager(getContext()));
         FloatingActionButton addTask = view.findViewById(R.id.btnAddTask);
         addTask.setOnClickListener(v -> getActivity()
