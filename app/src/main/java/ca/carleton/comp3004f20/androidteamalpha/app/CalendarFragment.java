@@ -24,7 +24,6 @@ import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-import com.roomorama.caldroid.CaldroidFragment;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -63,7 +62,7 @@ public class CalendarFragment extends Fragment {
 
         FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("tasks")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @RequiresApi(api = Build.VERSION_CODES.O)

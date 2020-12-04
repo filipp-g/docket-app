@@ -39,7 +39,7 @@ public class ProjectsFragment extends Fragment {
 
         DatabaseReference projectDatabase = FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .child("projects");
 
         FirebaseRecyclerOptions<Project> options = new FirebaseRecyclerOptions.Builder<Project>()
@@ -130,7 +130,7 @@ public class ProjectsFragment extends Fragment {
                     for (String project : selectedProjectNames) {
                         DatabaseReference taskDatabase = FirebaseDatabase.getInstance()
                                 .getReference()
-                                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName());
+                                .child(FirebaseAuth.getInstance().getCurrentUser().getUid());
                         Query query= taskDatabase.child("tasks").orderByChild("projectId").equalTo(project);
                         query.addListenerForSingleValueEvent(new ValueEventListener() {
                             @Override

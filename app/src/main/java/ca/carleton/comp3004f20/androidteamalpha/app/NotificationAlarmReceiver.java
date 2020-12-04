@@ -28,36 +28,34 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
         }
 
         PendingIntent projectsIntent = PendingIntent.getActivity(context, 0,
-                new Intent(context, ProjectsFragment.class), PendingIntent.FLAG_UPDATE_CURRENT);
+                new Intent(context, TasksFragment.class), PendingIntent.FLAG_UPDATE_CURRENT);
 
-        try {
-            FirebaseDatabase.getInstance()
+        FirebaseDatabase.getInstance()
                 .getReference()
-                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
-                .child("tasks")
+                .child(FirebaseAuth.getInstance().getCurrentUser().getUid())
                 .addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot snapshot) {
+                        int period = snapshot.child("settings").child("notify_due_period").getValue(int.class);
                         Calendar calendar = Calendar.getInstance();
-                        for (DataSnapshot task : snapshot.getChildren()) {
+                        for (DataSnapshot task : snapshot.child("tasks").getChildren()) {
                             calendar.setTimeInMillis(System.currentTimeMillis());
                             calendar = setDueDate(calendar, task.child("dueDate").getValue().toString());
                             calendar = setDueTime(calendar, task.child("dueTime").getValue().toString());
 
-                            if (taskIsDueSoon(calendar)) {
-                                createNotification(context, task, projectsIntent);
+                            if (taskIsDueSoon(calendar, period)) {
+                                createNotification(context, task, projectsIntent, period);
                             }
                         }
                     }
-                    @Override
-                    public void onCancelled(@NonNull DatabaseError error) { }
-                });
-        } catch (Exception e) {
 
-        }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError error) {
+                    }
+                });
     }
 
-    private void createNotification(Context context, DataSnapshot task, PendingIntent intent) {
+    private void createNotification(Context context, DataSnapshot task, PendingIntent intent, int period) {
         String name = task.child("name").getValue().toString();
         String dueDateString = Utilities.formatReadableDate(task.child("dueDate").getValue().toString());
         String dueTime = task.child("dueTime").getValue().toString();
@@ -67,7 +65,7 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
         NotificationCompat.Builder builder = new NotificationCompat
                 .Builder(context, "DEFAULT_CHANNEL_ID")
                 .setSmallIcon(R.drawable.ic_projects)
-                .setContentTitle(name + " is due soon!")
+                .setContentTitle(name + " is due in less than " + period + "h!")
                 .setContentText("Due: " + dueDateString)
                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
                 .setContentIntent(intent)
@@ -76,11 +74,11 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
                 .notify(0, builder.build());
     }
 
-    // task is due in less than 24 hours
-    private boolean taskIsDueSoon(Calendar calendar) {
+    // task is due in less than <period> hours
+    private boolean taskIsDueSoon(Calendar calendar, int period) {
         float now = (float) Calendar.getInstance().getTimeInMillis() / MILLIS_IN_HOUR;
         float due = (float) calendar.getTimeInMillis() / MILLIS_IN_HOUR;
-        return due - now > 0 && due - now < 24;
+        return due - now > 0 && due - now < period;
     }
 
     private Calendar setDueDate(Calendar calendar, String dueDate) {
@@ -95,7 +93,7 @@ public class NotificationAlarmReceiver extends BroadcastReceiver {
     private Calendar setDueTime(Calendar calendar, String dueTime) {
         if (!dueTime.isEmpty()) {
             int hour = Integer.parseInt(dueTime.substring(0, dueTime.indexOf(":")));
-            int minute = Integer.parseInt(dueTime.substring(dueTime.indexOf(":") + 1, dueTime.indexOf(":") + 3));
+            int minute = Integer.parseInt(dueTime.substring(dueTime.indexOf(":") + 1));
             calendar.set(Calendar.HOUR_OF_DAY, hour);
             calendar.set(Calendar.MINUTE, minute);
         }

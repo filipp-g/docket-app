@@ -1,0 +1,4 @@
+- Set up profile management screen
+- Added persistent configuration for notifications
+- Refactor app to store Firebase data under userId instead of userName
+- Complete notifications to user persistent configuration
