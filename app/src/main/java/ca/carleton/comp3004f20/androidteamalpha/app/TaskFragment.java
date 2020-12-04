@@ -187,7 +187,6 @@ public class TaskFragment extends Fragment {
             task.setId(pushRef.getKey());
             pushRef.setValue(task, (error, ref) -> {
                 if (error == null) {
-                    Toast.makeText(getContext(), "Task saved", Toast.LENGTH_SHORT).show();
                     launchProjectsFragment();
                 } else {
                     Toast.makeText(getContext(), error.getMessage(), Toast.LENGTH_LONG).show();

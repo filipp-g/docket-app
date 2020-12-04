@@ -1,191 +1,224 @@
 package ca.carleton.comp3004f20.androidteamalpha.app;
 
-import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Chronometer;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.Spinner;
+import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
-import androidx.core.content.res.ResourcesCompat;
+import androidx.annotation.RequiresApi;
 import androidx.fragment.app.Fragment;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
-import org.apache.commons.lang3.StringUtils;
+import java.util.ArrayList;
+import java.util.List;
 
-import java.util.concurrent.ExecutionException;
+import static java.lang.Math.min;
 
-import static java.lang.Math.ceil;
-
-public class TimerFragment extends Fragment {
+public class TimerFragment extends Fragment implements AdapterView.OnItemClickListener {
 
     // TIMER VARIABLES
-    private FloatingActionButton fab;
-    private TextView timerCounterText;
-    private EditText timerEditText;
-    private int timerMinutes = 30;
-    private boolean timerStopped = true;
+    private FloatingActionButton start;
+    private FloatingActionButton stop;
+    private FloatingActionButton pause;
     private FrameLayout mainView;
+    private Chronometer chronometer;
+    private Chronometer chronometerSeconds;
+    private Spinner taskSpinner;
+    private boolean running = false;
+    private long pauseOffsetSeconds = 0;
+    private long pauseOffsetMinites = 0;
+    private List<String> listOfTasks = new ArrayList<>();
+    private List<String> tasksID = new ArrayList<>();
+    private List<Integer> tasksTimeSpent = new ArrayList<>();
+    private List<Integer> tasksTimeRequired = new ArrayList<>();
+    private List<Integer> tasksMinutes = new ArrayList<>();
+    private int taskLength = 0;
+    private DatabaseReference taskDatabase;
 
-    // ASYNC VARIABLES
-    private AsyncCountdownTimerTask timerTask;
-
-    // TIMER FUNCTIONS
-    private void showTimerEditDialog() {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(getContext());
-
-        View view = getLayoutInflater().inflate(R.layout.dialog_edit_timer, null, false);
-        final EditText timerMinsEditText = view.findViewById(R.id.timer_mins_edit_text);
-        timerMinsEditText.setText(String.valueOf(timerMinutes));
-        dialogBuilder.setView(view);
-
-        AlertDialog dialog = dialogBuilder.create();
-        dialog.show();
-        dialog.setOnDismissListener(d -> {
-            timerMinutes = Integer.parseInt(timerMinsEditText.getText().toString());
-            resetTimer();
-        });
-    }
-    private void startTimer() {
-        fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_stop, getActivity().getTheme()));
-        timerStopped = false;
-        timerTask = new AsyncCountdownTimerTask();
-        timerTask.execute(timerMinutes);
-    }
-    private void stopTimer() {
-        if (timerTask != null) {
-            if (timerTask.isRunning()) timerTask.setRunning(false);
-            try {
-                // Wait for task to finish
-                timerTask.get();
-            } catch (ExecutionException e) {
-                // Do nothing
-            } catch (InterruptedException e) {
-                // Do nothing
-            }
-        }
-
-        fab.setImageDrawable(ResourcesCompat.getDrawable(getResources(), R.drawable.ic_play, getActivity().getTheme()));
-        timerStopped = true;
-    }
-    private void logTime() {
-        // Todo: log time to firebase / etc
-        Snackbar.make(mainView, "Logged " + String.valueOf(timerMinutes) + " minutes", Snackbar.LENGTH_SHORT).show();
-    }
-    private void updateTimer(int minutes, int seconds) {
-        timerCounterText.setText(StringUtils.leftPad(String.valueOf(minutes), 2, "0") + ":" + StringUtils.leftPad(String.valueOf(seconds), 2, "0"));
-    }
-    private void resetTimer() {
-        stopTimer();
-        updateTimer(timerMinutes, 0);
-    }
+    private static final int minInLong = 3600000;
+    private static final int hourInLong = 60000;
 
     // FRAGMENT SETUP FUNCTIONS
     public TimerFragment() {
         // Required empty public constructor
     }
 
+
     @Override public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
+
     @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_timer, container, false);
 
         // Get component ids
-        fab = view.findViewById(R.id.fab_play);
-        timerCounterText = view.findViewById(R.id.timer_counter_text);
-        timerEditText = view.findViewById(R.id.timer_edit_text);
+        start = view.findViewById(R.id.fab_play);
+        stop = view.findViewById(R.id.fab_stop);
+        pause = view.findViewById(R.id.fab_pause);
+
         mainView = view.findViewById(R.id.main);
+        chronometer = view.findViewById(R.id.chronometer);
+        chronometerSeconds = view.findViewById(R.id.chronometerSeconds);
 
-        // Setup action listeners
-        fab.setOnLongClickListener(v -> {
-            resetTimer();
-            logTime();
-            return true;
+        chronometer.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                long time = SystemClock.elapsedRealtime() - chronometer.getBase();
+                int hours = (int) (time / minInLong);
+                int minutes = (int) (time - hours * minInLong)/ hourInLong;
+                chronometer.setText(String.format("%02d:%02d", hours, minutes));
+            }
         });
 
-        fab.setOnClickListener(v -> {
-            if (timerStopped) startTimer();
-            else resetTimer();
+        chronometerSeconds.setOnChronometerTickListener(new Chronometer.OnChronometerTickListener() {
+            @Override
+            public void onChronometerTick(Chronometer chronometer) {
+                long time = SystemClock.elapsedRealtime() - chronometer.getBase();
+                int hours = (int) (time / minInLong);
+                int minutes = (int) (time - hours * minInLong)/ hourInLong;
+                int seconds = (int) (time - hours*minInLong- minutes*hourInLong)/1000;
+                chronometer.setText(String.format("%02d", seconds));
+            }
         });
 
-        timerEditText.setFocusableInTouchMode(false);
-        timerEditText.setOnClickListener(v -> showTimerEditDialog());
-        timerCounterText.setOnClickListener(v -> showTimerEditDialog());
+        taskDatabase = FirebaseDatabase.getInstance()
+                .getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child("tasks");
+
+        start.setOnClickListener(v -> {
+            if (!running) {
+                chronometer.setBase(SystemClock.elapsedRealtime() - pauseOffsetMinites);
+                chronometer.start();
+                chronometerSeconds.setBase(SystemClock.elapsedRealtime() - pauseOffsetSeconds);
+                chronometerSeconds.start();
+                running = true;
+            } else {
+                pauseOffsetMinites = pause(chronometer);
+                pauseOffsetSeconds= pause(chronometerSeconds);
+            }
+        });
+
+        pause.setOnClickListener(v -> {
+            if (running) {
+                pauseOffsetMinites = pause(chronometer);
+                pauseOffsetSeconds = pause(chronometerSeconds);
+            }
+        });
+
+        stop.setOnClickListener(v -> {
+            long millis = SystemClock.elapsedRealtime() - chronometer.getBase();
+            int h = (int)(millis/minInLong);
+            int m = (int)(millis - h*minInLong)/hourInLong;
+            int s= (int)(millis - h*minInLong- m*hourInLong)/1000;
+
+            chronometer.setBase(SystemClock.elapsedRealtime());
+            chronometerSeconds.setBase(SystemClock.elapsedRealtime());
+            pauseOffsetSeconds = 0;
+            pauseOffsetMinites = 0;
+
+            for (int counter = 0; counter < taskLength; counter++) {
+                String databaseId = listOfTasks.get(counter);
+                if (taskSpinner.getSelectedItem().toString().contains(databaseId)) {
+                    String localId = tasksID.get(counter);
+                    int localTimeSpent = Integer.parseInt(tasksTimeSpent.get(counter).toString());
+                    int localTimeRequired = Integer.parseInt(tasksTimeRequired.get(counter).toString());
+                    localTimeSpent += m;
+
+                    if (h > 0) {
+                        localTimeSpent =+ h*60;
+                    }
+
+
+                    taskDatabase.child(localId).child("timeSpent").setValue(localTimeSpent);
+
+                    if (localTimeSpent >= localTimeRequired) {
+                        taskDatabase.child(localId).child("complete").setValue(true);
+                        Toast.makeText(getContext(),"time spend: " + h + ":" + m + ":" + s +
+                                        "\ntotal time spend: " + (h * 60 + m) +
+                                        "\n\n\nThe task is now complete",
+                                Toast.LENGTH_LONG).show();
+                    } else {
+                        int hoursLeft = localTimeRequired - localTimeSpent;
+                        Toast.makeText(getContext(),"time spend: " + h + ":" + m + ":" + s +
+                                "\ntotal time spend: " + (h * 60 + m) + "\n\n\n" + hoursLeft +
+                                " minites left on the task", Toast.LENGTH_LONG).show();
+                    }
+
+                    break;
+                }
+            }
+        });
+
+        FirebaseDatabase.getInstance()
+                .getReference()
+                .child(FirebaseAuth.getInstance().getCurrentUser().getDisplayName())
+                .child("tasks")
+                .orderByChild("dueDate")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @RequiresApi(api = Build.VERSION_CODES.O)
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        populateTasks(view, dataSnapshot);
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
 
         return view;
     }
 
-    // Countdown Timer Task
-    private class AsyncCountdownTimerTask extends AsyncTask<Integer, Integer, Boolean> {
+    private long pause(Chronometer chronometer) {
+        chronometer.stop();
+        long pauseOffset = SystemClock.elapsedRealtime() - chronometer.getBase();
+        running = false;
 
-        private static final int CHECKS_PER_SECOND = 30;
-        private boolean running = true;
-        private int totalSeconds;
+        return pauseOffset;
+    }
 
-        public synchronized void setRunning(boolean running) {
-            this.running = running;
+    private void populateTasks(View view, DataSnapshot dataSnapshot) {
+        for (DataSnapshot task : dataSnapshot.getChildren()) {
+            String name = task.child("name").getValue().toString();
+            String id = task.child("id").getValue().toString();
+            int timeSpent = Integer.parseInt(task.child("timeSpent").getValue().toString());
+            int timeRequired = Integer.parseInt(task.child("timeRequired").getValue().toString());
+            int timeSpentHours = timeSpent/60;
+            listOfTasks.add(name);
+            tasksID.add(id);
+            tasksTimeSpent.add(timeSpent);
+            tasksTimeRequired.add(timeRequired);
+            tasksMinutes.add(timeSpent - timeSpentHours*60);
+            taskLength++;
         }
 
-        public boolean isRunning() {
-            return running;
-        }
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(
+                getActivity(), R.layout.projects_spinner_item, listOfTasks);
 
-        @Override
-        protected Boolean doInBackground(Integer... integers) {
-            totalSeconds = integers[0]*60;
-            int seconds = totalSeconds;
-            int secondsLast = seconds;
-            long millisStart = System.currentTimeMillis();
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        taskSpinner = view.findViewById(R.id.task_Spinner);
+        taskSpinner.setAdapter(adapter);
+    }
 
-            while (seconds > 0) {
-                long sleepTimeMillis = 1000/CHECKS_PER_SECOND;
-
-                try {
-                    Thread.sleep(sleepTimeMillis);
-                } catch (InterruptedException e) {
-                    // Stop execution
-                    break;
-                }
-
-                // Todo: fix this code, timer will be off <1 second
-                long millisCurrent = System.currentTimeMillis();
-                if (running) {
-                    seconds = totalSeconds - (int)ceil((double)(millisCurrent - millisStart) / 1000);
-
-                    if (seconds < secondsLast) {
-                        secondsLast = seconds;
-                        publishProgress(seconds);
-                    }
-                    else continue;
-                } else {
-                    break;
-                }
-            }
-
-            return seconds == 0;
-        }
-
-        @Override
-        protected void onProgressUpdate(Integer... values) {
-            super.onProgressUpdate(values);
-            updateTimer(values[0] / 60, values[0] % 60);
-        }
-
-        @Override
-        protected void onPostExecute(Boolean notInterrupted) {
-            super.onPostExecute(notInterrupted);
-
-            if (notInterrupted) {
-                resetTimer();
-                logTime();
-            }
-        }
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String text = parent.getItemAtPosition(position).toString();
+        Toast.makeText(parent.getContext(), text, Toast.LENGTH_SHORT).show();
     }
 }

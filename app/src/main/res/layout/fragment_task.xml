@@ -65,7 +65,7 @@
             android:id="@+id/txtTimeReq"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time Required (h)"
+            android:text="Time Required (m)"
             app:layout_constraintBottom_toBottomOf="@+id/editTextTimeReq"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toTopOf="@+id/editTextTimeReq" />
@@ -74,7 +74,7 @@
             android:id="@+id/txtTimeSpent"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Time Spent (h)"
+            android:text="Time Spent (m)"
             app:layout_constraintBottom_toBottomOf="@+id/editTextTimeSpent"
             app:layout_constraintEnd_toStartOf="@+id/guideline3"
             app:layout_constraintTop_toTopOf="@+id/editTextTimeSpent" />
@@ -94,7 +94,9 @@
             android:layout_height="33dp"
             android:layout_marginTop="10dp"
             android:textAlignment="center"
+            android:background="@drawable/ic_black_margin"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/txtTaskProject"
             app:layout_constraintTop_toBottomOf="@+id/editTextName" />
 
         <EditText
