@@ -1,0 +1,5 @@
+- Fix errors on the task page that Fill wasn't aware of.
+- Set up the program so it works well with my android device I have physicaly.
+- Set up the task pase so that it saves progress on adding tasks.
+- Made changes on the tavagation tool bar.
+- Develop the overview page so that the user can see all of the tasks in squares buttons.

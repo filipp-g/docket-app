@@ -1,0 +1,2 @@
+- Study for oral exam and study the code.
+- prepare the presentation for the oral exam.

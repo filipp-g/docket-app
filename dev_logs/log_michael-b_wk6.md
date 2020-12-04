@@ -1,0 +1,3 @@
+- Add a main menu.
+- Add a scroll effect to scroll horizontaly to view tasks.
+- To busy studying for exams for next week.

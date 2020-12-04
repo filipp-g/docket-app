@@ -1,0 +1,2 @@
+- Try to find a better calender for our application.
+- Write the different styles for the app in our report.

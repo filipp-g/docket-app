@@ -1,0 +1,3 @@
+- Study and learn how the program will interact with Firebase.
+- Test the program to see if can access the database by adding and accessing data.
+- Test the program to see if can access the Athentication by putting by sign in though the account.

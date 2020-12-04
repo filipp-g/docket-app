@@ -1,0 +1,3 @@
+- Study Firebase. 
+- Setup the Firebase and connect it to our app.
+- Setup the authentication and the Database in Firebase.

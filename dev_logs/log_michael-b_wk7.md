@@ -1,0 +1,3 @@
+- Still studying for exams this week.
+- Develop an algorith to add all of the tasks from the database to the calender by the user.
+- Merge my branch with the master.

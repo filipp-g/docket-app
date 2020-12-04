@@ -1,0 +1,3 @@
+- Add an calender to the app and able to add different Task Events to the chalender.
+- Able to set up the chalender program to add icons on certain days the Task is due.
+- Add the sign in menu and sign up menu for user to sign in the program.
