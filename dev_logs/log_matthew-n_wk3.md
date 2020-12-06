@@ -1,0 +1,2 @@
+- Read up and learned android
+- Got familiarized with android studio
