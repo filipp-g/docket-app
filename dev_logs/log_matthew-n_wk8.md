@@ -1,0 +1,3 @@
+- Added delete button to projects screen
+- Added delete task function to projects
+- Can delete muiltple tasks at once

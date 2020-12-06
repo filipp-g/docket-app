@@ -1,0 +1,3 @@
+- Added the ability to group tasks into projects
+- Tasks are now sorted by the project
+- Delete multiple projects at once

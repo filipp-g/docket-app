@@ -1,0 +1,2 @@
+- Added bottom navigation bar
+- Changed existing activities into fragments
