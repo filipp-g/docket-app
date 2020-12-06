@@ -1,0 +1,2 @@
+- Tested code for bugs
+- Prep demo and helped finished D4 document

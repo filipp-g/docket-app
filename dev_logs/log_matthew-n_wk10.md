@@ -1,0 +1,2 @@
+- Added the ability to create projects and save them to firebase
+- Populated tasks creation screen with list of existing projects

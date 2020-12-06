@@ -1,0 +1,2 @@
+- Read up and familiarized myself with firebase
+- Expanded my android knowledge

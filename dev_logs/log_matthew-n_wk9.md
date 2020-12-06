@@ -1,0 +1,3 @@
+- Added conformation box for delete tasks
+- Listed items that would be deleted
+- Prep demo and document for D2
