@@ -49,7 +49,7 @@ public class Task implements Serializable {
         this.id = "";
         this.name = "";
         this.projectId = "";
-        this.dueDate = (new SimpleDateFormat("MMM dd yyyy", Locale.CANADA)).format(date);
+        this.dueDate = (new SimpleDateFormat("yyyy-MM-dd", Locale.CANADA)).format(date);
         this.dueTime = "";
         this.weight = 0;
         this.timeRequired = 0;
