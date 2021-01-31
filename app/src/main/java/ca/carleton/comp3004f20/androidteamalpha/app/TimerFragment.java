@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Chronometer;
-import android.widget.FrameLayout;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -27,8 +26,6 @@ import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static java.lang.Math.min;
 
 public class TimerFragment extends Fragment implements AdapterView.OnItemClickListener {
     private static final String TASK = "taskObj";
@@ -60,11 +57,13 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
     }
 
 
-    @Override public void onCreate(Bundle savedInstanceState) {
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     }
 
-    @Override public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.fragment_timer, container, false);
 
@@ -83,7 +82,7 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
             public void onChronometerTick(Chronometer chronometer) {
                 long time = SystemClock.elapsedRealtime() - chronometer.getBase();
                 int hours = (int) (time / minInLong);
-                int minutes = (int) (time - hours * minInLong)/ hourInLong;
+                int minutes = (int) (time - hours * minInLong) / hourInLong;
                 chronometer.setText(String.format("%02d:%02d", hours, minutes));
             }
         });
@@ -93,8 +92,8 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
             public void onChronometerTick(Chronometer chronometer) {
                 long time = SystemClock.elapsedRealtime() - chronometer.getBase();
                 int hours = (int) (time / minInLong);
-                int minutes = (int) (time - hours * minInLong)/ hourInLong;
-                int seconds = (int) (time - hours*minInLong- minutes*hourInLong)/1000;
+                int minutes = (int) (time - hours * minInLong) / hourInLong;
+                int seconds = (int) (time - hours * minInLong - minutes * hourInLong) / 1000;
                 chronometer.setText(String.format("%02d", seconds));
             }
         });
@@ -113,7 +112,7 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
                 running = true;
             } else {
                 pauseOffsetMinites = pause(chronometer);
-                pauseOffsetSeconds= pause(chronometerSeconds);
+                pauseOffsetSeconds = pause(chronometerSeconds);
             }
         });
 
@@ -128,9 +127,9 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
             chronometerSeconds.stop();
             chronometer.stop();
             long millis = SystemClock.elapsedRealtime() - chronometer.getBase();
-            int h = (int)(millis/minInLong);
-            int m = (int)(millis - h*minInLong)/hourInLong;
-            int s = (int)(millis - h*minInLong- m*hourInLong)/1000;
+            int h = (int) (millis / minInLong);
+            int m = (int) (millis - h * minInLong) / hourInLong;
+            int s = (int) (millis - h * minInLong - m * hourInLong) / 1000;
 
             chronometer.setBase(SystemClock.elapsedRealtime());
             chronometerSeconds.setBase(SystemClock.elapsedRealtime());
@@ -146,7 +145,7 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
                     localTimeSpent += m;
 
                     if (h > 0) {
-                        localTimeSpent =+ h*60;
+                        localTimeSpent = +h * 60;
                     }
 
 
@@ -154,13 +153,13 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
 
                     if (localTimeSpent >= localTimeRequired) {
                         taskDatabase.child(localId).child("complete").setValue(true);
-                        Toast.makeText(getContext(),"time spend: " + h + ":" + m + ":" + s +
+                        Toast.makeText(getContext(), "time spend: " + h + ":" + m + ":" + s +
                                         "\ntotal time spend: " + (h * 60 + m) +
                                         "\n\n\nThe task is now complete",
                                 Toast.LENGTH_LONG).show();
                     } else {
                         int hoursLeft = localTimeRequired - localTimeSpent;
-                        Toast.makeText(getContext(),"time spend: " + h + ":" + m + ":" + s +
+                        Toast.makeText(getContext(), "time spend: " + h + ":" + m + ":" + s +
                                 "\ntotal time spend: " + (h * 60 + m) + "\n\n\n" + hoursLeft +
                                 " minites left on the task", Toast.LENGTH_LONG).show();
                     }
@@ -180,6 +179,7 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
                     public void onDataChange(DataSnapshot dataSnapshot) {
                         populateTasks(view, dataSnapshot);
                     }
+
                     @Override
                     public void onCancelled(DatabaseError databaseError) {
                     }
@@ -202,12 +202,12 @@ public class TimerFragment extends Fragment implements AdapterView.OnItemClickLi
             String id = task.child("id").getValue().toString();
             int timeSpent = Integer.parseInt(task.child("timeSpent").getValue().toString());
             int timeRequired = Integer.parseInt(task.child("timeRequired").getValue().toString());
-            int timeSpentHours = timeSpent/60;
+            int timeSpentHours = timeSpent / 60;
             listOfTasks.add(name);
             tasksID.add(id);
             tasksTimeSpent.add(timeSpent);
             tasksTimeRequired.add(timeRequired);
-            tasksMinutes.add(timeSpent - timeSpentHours*60);
+            tasksMinutes.add(timeSpent - timeSpentHours * 60);
             taskLength++;
         }
 

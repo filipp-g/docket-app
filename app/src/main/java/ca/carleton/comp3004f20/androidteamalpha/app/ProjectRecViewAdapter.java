@@ -84,5 +84,5 @@ public class ProjectRecViewAdapter extends FirebaseRecyclerAdapter<Project, Proj
             return view;
         }
     }
-    
+
 }

@@ -111,7 +111,7 @@ public class TaskFragment extends Fragment {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 List<String> projectList = new ArrayList<>();
-                for (DataSnapshot dataSnap : snapshot.getChildren()){
+                for (DataSnapshot dataSnap : snapshot.getChildren()) {
                     Project project = dataSnap.getValue(Project.class);
                     projectList.add(project.getName());
                 }

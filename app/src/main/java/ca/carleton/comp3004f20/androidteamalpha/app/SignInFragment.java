@@ -32,7 +32,7 @@ public class SignInFragment extends Fragment {
         mAuth = FirebaseAuth.getInstance();
 
         ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Sign in");
-        ((MainActivity)getActivity()).hideBottomNav();
+        ((MainActivity) getActivity()).hideBottomNav();
 
         Button signUp = view.findViewById(R.id.signUp);
         signUp.setOnClickListener(v ->
@@ -67,7 +67,7 @@ public class SignInFragment extends Fragment {
                                 .beginTransaction()
                                 .replace(R.id.container, new ProfileFragment())
                                 .commit();
-                        ((MainActivity)getActivity()).showBottomNav();
+                        ((MainActivity) getActivity()).showBottomNav();
                     } else {
                         Toast.makeText(getActivity(), "Invalid Username/Password...", Toast.LENGTH_SHORT).show();
                     }
