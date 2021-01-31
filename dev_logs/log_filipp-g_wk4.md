@@ -1,2 +1,0 @@
-- Added feature (user story) ideas to group spreadsheet
-- Created basic Task activity in android app and completed layout

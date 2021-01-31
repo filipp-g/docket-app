@@ -1,2 +1,0 @@
-- Added init function to main activity to initialize fragments with database details
-- Added toast notifications

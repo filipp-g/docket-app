@@ -1,2 +1,0 @@
-- Add input validation to Task Activity
-- Save Tasks to Firebase

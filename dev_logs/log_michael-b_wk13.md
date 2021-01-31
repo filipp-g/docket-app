@@ -1,3 +1,0 @@
-- Do Matteo work since he drop out.
-- Do a stop watch to record the time.
-- Convert the hours into minites in timeSpend and timeRequired.

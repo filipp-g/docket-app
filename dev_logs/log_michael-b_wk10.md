@@ -1,2 +1,0 @@
-- Finnish developing the calender so it shows the icons on certain that represents which days has tasks.
-- Updating and fixing the overview.

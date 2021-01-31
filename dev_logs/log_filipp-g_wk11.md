@@ -1,4 +1,0 @@
-- Complete basic notifications
-- Sharpen up app-wide UI
-- Reformat how date is stored for sorting by date
-- Code cleanup for class diagram

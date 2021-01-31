@@ -1,2 +1,0 @@
-- Created the top navigation bar
-- Added sign out feature to the top of the screen

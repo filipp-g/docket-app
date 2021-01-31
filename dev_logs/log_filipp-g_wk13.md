@@ -1,6 +1,0 @@
-- Set up profile management screen
-- Added persistent configuration for notifications
-- Refactor app to store Firebase data under userId instead of userName
-- Complete notifications to user persistent configuration
-- Add titles to all fragments
-- Add press effect to projects- and tasks-lists

@@ -1,3 +1,0 @@
-- Brainstormed ideas for app demo presentations
-- Planned possible app architecture directions
-- Drew up sketches for app UI and basic data models

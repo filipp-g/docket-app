@@ -1,7 +1,0 @@
-- Add projects-list activity
-- Add generic RecyclerView for Tasks
-- Convert projects-list to fragment
-- Figure out retrieving data from Firebase
-- Improve projects-list UI
-- Fix bottom nav lying on top of other elements
-- Add task-update workflow

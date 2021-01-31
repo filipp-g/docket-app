@@ -1,2 +1,0 @@
-- Helped finish and prep D3
-- Made User scenario diagrams and architecture model diagrams

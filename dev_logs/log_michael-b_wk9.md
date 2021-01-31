@@ -1,3 +1,0 @@
-- Set the overview and calender to able to edit the tasks by taping the days and buttons.
-- Also, develop a button to be able to switch from the calender to the overview.
-- Also add icons to the add button and the switch button in the overview and calender view.
